@@ -47,6 +47,8 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         app_build: Optional[str] = None,
         group_state: Optional[ErrorGroupState] = None,
         error_type: Optional[str] = None,
+        order_by: Optional[str] = None,
+        limit: int = 30,
     ) -> Iterator[ErrorGroupListItem]:
         """Get the error groups for an app.
 
@@ -58,9 +60,13 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param Optional[str] app_build: The build to restrict the search to (if any)
         :param Optional[ErrorGroupState] group_state: Set to filter to just this group state (open, closed, ignored)
         :param Optional[str] error_type: Set to filter to specific types of error (all, unhandledError, handledError)
+        :param Optional[str] order_by: The order by parameter to pass in (this will be encoded for you)
+        :param Optional[str] limit: The max number of results to return per request (should not go past 100)
 
         :returns: An iterator of ErrorGroupListItem
         """
+
+        # pylint: disable=too-many-locals
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups?"
@@ -81,6 +87,12 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         if error_type:
             parameters["errorType"] = error_type
+
+        if order_by:
+            parameters["$orderby"] = order_by
+
+        if limit:
+            parameters["$top"] = str(limit)
 
         request_url += urllib.parse.urlencode(parameters)
 
@@ -104,6 +116,8 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             request_url = appcenter.constants.API_BASE_URL + error_groups.nextLink.replace(
                 "/api", "", 1
             )
+
+        # pylint: disable=too-many-locals
 
     def errors_in_group(
         self,

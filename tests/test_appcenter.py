@@ -29,6 +29,8 @@ class LibraryTests(unittest.TestCase):
             owner_name=LibraryTests.OWNER_NAME,
             app_name=LibraryTests.APP_NAME,
             start_time=datetime.datetime(2019, 9, 20, 12, 0, 0),
+            order_by="count desc",
+            limit=1,
         ):
             errors = client.crashes.errors_in_group(
                 owner_name=LibraryTests.OWNER_NAME,

@@ -1,6 +1,7 @@
-bin/*
+__pycache__
 .mypy_cache/*
 .pytest_cache/*
 *.egg-info/*
-__pycache__
+bin/*
+dist/*
 lib/*

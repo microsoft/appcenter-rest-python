@@ -7,9 +7,8 @@
 import datetime
 import os
 import sys
+from typing import List
 import unittest
-
-import keyper
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..")))
 import appcenter
@@ -17,10 +16,23 @@ import appcenter
 # pylint: disable=no-self-use
 
 
+def get_tokens() -> List[str]:
+    """Get the tokens for authentication.
+
+    :returns: The owner name, app name and token as a tuple.
+    """
+    try:
+        import keyper
+
+        return keyper.get_password(label="appcenter").split(":")
+    except ImportError:
+        return os.environ["appcenter"].split(":")
+
+
 class LibraryTests(unittest.TestCase):
     """Basic tests."""
 
-    OWNER_NAME, APP_NAME, TOKEN = keyper.get_password(label="appcenter").split(":")
+    OWNER_NAME, APP_NAME, TOKEN = get_tokens()
 
     def test_construction(self):
         """Test construction."""

@@ -40,19 +40,19 @@ class HandledErrorReasonFrame:
         java = "Java"
         unknown = "Unknown"
 
-    className: str  # name of the class
-    method: str  # name of the method
-    classMethod: bool  # is a class method
-    file: str  # name of the file
-    line: int  # line number
-    appCode: bool  # this line isn't from any framework
-    frameworkName: str  # Name of the framework
-    codeFormatted: str  # Formatted frame string
-    codeRaw: str  # Unformatted Frame string
-    methodParams: str  # parameters of the frames method
-    exceptionType: str  # Exception type.
-    osExceptionType: str  # OS exception type. (aka. SIGNAL)
-    language: ProgrammingLanguage  # programming language of the frame
+    className: Optional[str]  # name of the class
+    method: Optional[str]  # name of the method
+    classMethod: Optional[bool]  # is a class method
+    file: Optional[str]  # name of the file
+    line: Optional[int]  # line number
+    appCode: Optional[bool]  # this line isn't from any framework
+    frameworkName: Optional[str]  # Name of the framework
+    codeFormatted: Optional[str]  # Formatted frame string
+    codeRaw: Optional[str]  # Unformatted Frame string
+    methodParams: Optional[str]  # parameters of the frames method
+    exceptionType: Optional[str]  # Exception type.
+    osExceptionType: Optional[str]  # OS exception type. (aka. SIGNAL)
+    language: Optional[ProgrammingLanguage]  # programming language of the frame
 
 
 class ErrorGroupState(enum.Enum):
@@ -90,6 +90,31 @@ class ErrorGroups:
 
     nextLink: Optional[str]
     errorGroups: List[ErrorGroupListItem]
+
+
+@deserialize.parser("firstOccurrence", iso8601parse)
+@deserialize.parser("lastOccurrence", iso8601parse)
+class ErrorGroup:
+
+    state: ErrorGroupState
+    annotation: Optional[str]
+    errorGroupId: str
+    appVersion: str
+    appBuild: str
+    count: int
+    deviceCount: int
+    firstOccurrence: datetime.datetime
+    lastOccurrence: datetime.datetime
+    exceptionType: Optional[str]
+    exceptionMessage: Optional[str]
+    exceptionClassName: Optional[str]
+    exceptionClassMethod: Optional[bool]
+    exceptionMethod: Optional[str]
+    exceptionAppCode: Optional[bool]
+    exceptionFile: Optional[str]
+    exceptionLine: Optional[str]
+    codeRaw: Optional[str]
+    reasonFrames: Optional[List[HandledErrorReasonFrame]]
 
 
 @deserialize.parser("timestamp", iso8601parse)

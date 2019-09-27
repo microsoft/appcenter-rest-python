@@ -14,6 +14,7 @@ import deserialize
 import appcenter.constants
 from appcenter.derived_client import AppCenterDerivedClient
 from appcenter.models import (
+    ErrorGroup,
     ErrorGroups,
     ErrorGroupListItem,
     ErrorGroupState,
@@ -35,6 +36,25 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("crashes", token, parent_logger)
+
+    def group_details(
+        self, *, owner_name: str, app_name: str, error_group_id: str
+    ) -> Iterator[ErrorGroup]:
+        """Get the error group details.
+
+        :param str owner_name: The name of the app account owner
+        :param str app_name: The name of the app
+        :param str error_group_id: The ID of the error group to get the details for
+
+        :returns: An ErrorGroup
+        """
+
+        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url += f"/errors/errorGroups/{error_group_id}"
+
+        response = self.get(request_url, retry_count=3)
+
+        return deserialize.deserialize(ErrorGroup, response.json())
 
     def get_error_groups(
         self,

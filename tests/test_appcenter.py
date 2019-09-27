@@ -44,6 +44,14 @@ class LibraryTests(unittest.TestCase):
             order_by="count desc",
             limit=1,
         ):
+            details = client.crashes.group_details(
+                owner_name=LibraryTests.OWNER_NAME,
+                app_name=LibraryTests.APP_NAME,
+                error_group_id=result.errorGroupId,
+            )
+
+            self.assertIsNotNone(details)
+
             errors = client.crashes.errors_in_group(
                 owner_name=LibraryTests.OWNER_NAME,
                 app_name=LibraryTests.APP_NAME,

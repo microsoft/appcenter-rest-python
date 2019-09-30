@@ -5,11 +5,14 @@
 
 import logging
 import time
-from typing import Any, Dict, Tuple, BinaryIO
+from typing import Any, Callable, Dict, Optional, Tuple, BinaryIO
 
 import requests
 
 from appcenter.constants import API_BASE_URL
+
+
+ProgressCallback = Callable[[int, Optional[int]], None]
 
 
 class AppCenterDerivedClient:

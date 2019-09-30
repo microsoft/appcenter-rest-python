@@ -164,7 +164,7 @@ class LibraryTests(unittest.TestCase):
             app_name="UploadTestApp",
             version="0.1",
             build_number="123",
-            symbols_path="/path/to/some.dSYM",
+            symbols_path="/path/to/some.dSYM.zip",
             symbol_type=appcenter.models.SymbolType.apple,
         )
 

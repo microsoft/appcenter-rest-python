@@ -27,8 +27,9 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-deserialize = "=0.10.0"
-requests = "=2.21.0"
+azure-storage-blob = "^2.1.0"
+deserialize = "^0.10.0"
+requests = "^2.21.0"
 
 [tool.poetry.dev-dependencies]
 black = "=19.3b0"

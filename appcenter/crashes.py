@@ -9,10 +9,11 @@ import os
 from typing import Iterator, Optional
 import urllib.parse
 
+from azure.storage.blob import BlockBlobService
 import deserialize
 
 import appcenter.constants
-from appcenter.derived_client import AppCenterDerivedClient
+from appcenter.derived_client import AppCenterDerivedClient, ProgressCallback
 from appcenter.models import (
     ErrorGroup,
     ErrorGroups,
@@ -310,6 +311,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         symbol_type: SymbolType,
         build_number: Optional[str] = None,
         version: Optional[str] = None,
+        progress_callback: Optional[ProgressCallback] = None,
     ) -> None:
         """Upload debug symbols
 
@@ -319,6 +321,11 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str symbol_type: The type of symbols being uploaded
         :param Optional[str] build_number: The build number (required for Android)
         :param Optional[str] version: The build version (required for Android)
+        :param Optional[ProgressCallback] progress_callback: The upload progress callback
+
+        For the upload progress callback, this is a callable where the first
+        parameter is the number of bytes uploaded, and the second parameter is
+        the total number of bytes to upload (if known).
 
         :raises Exception: If something goes wrong
         """
@@ -333,7 +340,15 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         )
 
         with open(symbols_path, "rb") as symbols_file:
-            self.azure_blob_upload(begin_upload_response.upload_url, file_stream=symbols_file)
+            url_components = urllib.parse.urlparse(begin_upload_response.upload_url)
+            path = url_components.path[1:]
+            container, blob_name = path.split("/")
+            connection_string = f"BlobEndpoint={url_components.scheme}://{url_components.netloc};"
+            connection_string += f"SharedAccessSignature={url_components.query}"
+            service = BlockBlobService(connection_string=connection_string)
+            service.create_blob_from_stream(
+                container, blob_name, symbols_file, progress_callback=progress_callback
+            )
 
         commit_response = self.commit_symbol_upload(
             owner_name=owner_name,

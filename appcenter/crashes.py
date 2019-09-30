@@ -37,9 +37,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("crashes", token, parent_logger)
 
-    def group_details(
-        self, *, owner_name: str, app_name: str, error_group_id: str
-    ) -> Iterator[ErrorGroup]:
+    def group_details(self, *, owner_name: str, app_name: str, error_group_id: str) -> ErrorGroup:
         """Get the error group details.
 
         :param str owner_name: The name of the app account owner
@@ -55,6 +53,44 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         response = self.get(request_url, retry_count=3)
 
         return deserialize.deserialize(ErrorGroup, response.json())
+
+    def set_annotation(
+        self,
+        *,
+        owner_name: str,
+        app_name: str,
+        error_group_id: str,
+        annotation: str,
+        state: Optional[ErrorGroupState] = None,
+    ) -> None:
+        """Get the error group details.
+
+        :param str owner_name: The name of the app account owner
+        :param str app_name: The name of the app
+        :param str error_group_id: The ID of the error group to set the annotation on
+        :param str annotation: The annotation text
+        :param Optional[ErrorGroupState] state: The state to set the error group to
+
+        The `state` parameter here does seem somewhat unusual, but it can't be
+        helped unfortunately. The API requires that we set the state with the
+        annotation. In order to work around this, the state can either be set
+        explicitly in this call, or if it is set to `None` (the default), we'll
+        read the existing state and use that.
+        """
+
+        if state is None:
+            request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+            request_url += f"/errors/errorGroups/{error_group_id}"
+
+            response = self.get(request_url, retry_count=3)
+
+            group = deserialize.deserialize(ErrorGroup, response.json())
+            state = group.state
+
+        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url += f"/errors/errorGroups/{error_group_id}"
+
+        self.patch(request_url, data={"state": state.value, "annotation": annotation})
 
     def get_error_groups(
         self,

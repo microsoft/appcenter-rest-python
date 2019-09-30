@@ -9,6 +9,7 @@ import os
 import sys
 from typing import List
 import unittest
+import uuid
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.abspath(__file__), "..", "..")))
 import appcenter
@@ -166,3 +167,35 @@ class LibraryTests(unittest.TestCase):
             symbols_path="/path/to/some.dSYM",
             symbol_type=appcenter.models.SymbolType.apple,
         )
+
+    def test_annotations(self):
+        """Test construction."""
+        client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
+
+        group_id = None
+        annotation = str(uuid.uuid4())
+
+        for result in client.crashes.get_error_groups(
+            owner_name=LibraryTests.OWNER_NAME,
+            app_name=LibraryTests.APP_NAME,
+            start_time=datetime.datetime(2019, 9, 20, 12, 0, 0),
+            order_by="count desc",
+            limit=1,
+        ):
+            group_id = result.errorGroupId
+            break
+
+        client.crashes.set_annotation(
+            owner_name=LibraryTests.OWNER_NAME,
+            app_name=LibraryTests.APP_NAME,
+            error_group_id=group_id,
+            annotation=annotation,
+        )
+
+        details = client.crashes.group_details(
+            owner_name=LibraryTests.OWNER_NAME,
+            app_name=LibraryTests.APP_NAME,
+            error_group_id=group_id,
+        )
+
+        self.assertEqual(details.annotation, annotation)

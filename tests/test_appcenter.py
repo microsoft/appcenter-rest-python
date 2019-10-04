@@ -23,7 +23,10 @@ def get_tokens() -> List[str]:
     :returns: The owner name, app name and token as a tuple.
     """
     try:
+        # pylint: disable=import-outside-toplevel
         import keyper
+
+        # pylint: enable=import-outside-toplevel
 
         return keyper.get_password(label="appcenter").split(":")
     except ImportError:

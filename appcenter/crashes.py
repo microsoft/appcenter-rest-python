@@ -21,6 +21,7 @@ from appcenter.models import (
     ErrorGroupState,
     HandledError,
     HandledErrors,
+    HandledErrorDetails,
     SymbolType,
     SymbolUploadBeginResponse,
     SymbolUploadEndRequest,
@@ -54,6 +55,26 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         response = self.get(request_url, retry_count=3)
 
         return deserialize.deserialize(ErrorGroup, response.json())
+
+    def error_details(
+        self, *, owner_name: str, app_name: str, error_group_id: str, error_id: str
+    ) -> HandledErrorDetails:
+        """Get the error details.
+
+        :param str owner_name: The name of the app account owner
+        :param str app_name: The name of the app
+        :param str error_group_id: The ID of the error group to get the details for
+        :param str error_id: The ID of the error to get the details for
+
+        :returns: A HandledErrorDetails
+        """
+
+        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}"
+
+        response = self.get(request_url, retry_count=3)
+
+        return deserialize.deserialize(HandledErrorDetails, response.json())
 
     def set_annotation(
         self,

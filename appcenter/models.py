@@ -20,9 +20,9 @@ def iso8601parse(date_string: Optional[str]) -> Optional[datetime.datetime]:
     if date_string is None:
         return None
     try:
-        return datetime.datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S.%fZ")
-    except ValueError:
         return datetime.datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return datetime.datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 # pylint: disable=missing-docstring
@@ -134,6 +134,26 @@ class HandledErrors:
 
     nextLink: Optional[str]
     errors: List[HandledError]
+
+
+@deserialize.parser("timestamp", iso8601parse)
+@deserialize.parser("appLaunchTimestamp", iso8601parse)
+class HandledErrorDetails:
+
+    errorId: Optional[str]
+    timestamp: Optional[datetime.datetime]
+    deviceName: Optional[str]
+    osVersion: Optional[str]
+    osType: Optional[str]
+    country: Optional[str]
+    language: Optional[str]
+    userId: Optional[str]
+    name: Optional[str]
+    reasonFrames: Optional[List[HandledErrorReasonFrame]]
+    appLaunchTimestamp: Optional[datetime.datetime]
+    carrierName: Optional[str]
+    jailbreak: Optional[bool]
+    properties: Optional[Dict[str, str]]
 
 
 class ReleaseOrigin(enum.Enum):

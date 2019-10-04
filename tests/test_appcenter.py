@@ -41,7 +41,7 @@ class LibraryTests(unittest.TestCase):
     def test_construction(self):
         """Test construction."""
         client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
-        for result in client.crashes.get_error_groups(
+        for group in client.crashes.get_error_groups(
             owner_name=LibraryTests.OWNER_NAME,
             app_name=LibraryTests.APP_NAME,
             start_time=datetime.datetime(2019, 9, 20, 12, 0, 0),
@@ -51,7 +51,7 @@ class LibraryTests(unittest.TestCase):
             details = client.crashes.group_details(
                 owner_name=LibraryTests.OWNER_NAME,
                 app_name=LibraryTests.APP_NAME,
-                error_group_id=result.errorGroupId,
+                error_group_id=group.errorGroupId,
             )
 
             self.assertIsNotNone(details)
@@ -60,11 +60,18 @@ class LibraryTests(unittest.TestCase):
                 owner_name=LibraryTests.OWNER_NAME,
                 app_name=LibraryTests.APP_NAME,
                 start_time=datetime.datetime(2019, 9, 20, 12, 0, 0),
-                error_group_id=result.errorGroupId,
+                error_group_id=group.errorGroupId,
             )
 
             has_errors = False
-            for _ in errors:
+            for error in errors:
+                full_details = client.crashes.error_details(
+                    owner_name=LibraryTests.OWNER_NAME,
+                    app_name=LibraryTests.APP_NAME,
+                    error_group_id=group.errorGroupId,
+                    error_id=error.errorId
+                )
+                self.assertIsNotNone(full_details)
                 has_errors = True
                 break
 

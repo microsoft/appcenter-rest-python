@@ -69,7 +69,7 @@ class LibraryTests(unittest.TestCase):
                     owner_name=LibraryTests.OWNER_NAME,
                     app_name=LibraryTests.APP_NAME,
                     error_group_id=group.errorGroupId,
-                    error_id=error.errorId
+                    error_id=error.errorId,
                 )
                 self.assertIsNotNone(full_details)
                 has_errors = True

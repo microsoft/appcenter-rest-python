@@ -301,6 +301,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :param Optional[str] commit_message: The message of the commit that was just built
 
         :raises FileNotFoundError: If the supplied binary is not found
+        :raises Exception: If we don't get a release ID back after upload
 
         :returns: The release details
         """
@@ -320,6 +321,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             owner_name=owner_name, app_name=app_name, upload_id=upload_begin_response.upload_id
         )
 
+        if upload_end_response.release_id is None:
+            raise Exception(f"Failed to get release ID for upload")
+
         build_info = BuildInfo(
             branch_name=branch_name, commit_hash=commit_hash, commit_message=commit_message
         )
@@ -338,8 +342,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             release_id=upload_end_response.release_id,
             group_id=group_id,
         )
-
-        # TODO dSYMS
 
         return self.release_details(
             owner_name=owner_name, app_name=app_name, release_id=upload_end_response.release_id

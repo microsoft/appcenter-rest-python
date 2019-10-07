@@ -69,7 +69,7 @@ class ErrorGroupListItem:
     annotation: Optional[str]
     errorGroupId: str
     appVersion: str
-    appBuild: str
+    appBuild: Optional[str]
     count: int
     deviceCount: int
     firstOccurrence: datetime.datetime
@@ -89,7 +89,7 @@ class ErrorGroupListItem:
 class ErrorGroups:
 
     nextLink: Optional[str]
-    errorGroups: List[ErrorGroupListItem]
+    errorGroups: Optional[List[ErrorGroupListItem]]
 
 
 @deserialize.parser("firstOccurrence", iso8601parse)
@@ -100,7 +100,7 @@ class ErrorGroup:
     annotation: Optional[str]
     errorGroupId: str
     appVersion: str
-    appBuild: str
+    appBuild: Optional[str]
     count: int
     deviceCount: int
     firstOccurrence: datetime.datetime
@@ -133,7 +133,7 @@ class HandledError:
 class HandledErrors:
 
     nextLink: Optional[str]
-    errors: List[HandledError]
+    errors: Optional[List[HandledError]]
 
 
 @deserialize.parser("timestamp", iso8601parse)
@@ -208,11 +208,11 @@ class DestinationType(enum.Enum):
 @deserialize.key("store_type", "type")
 class Destination:
     identifier: str
-    name: str
-    destination_type: DestinationType
+    name: Optional[str]
     is_latest: Optional[bool]
     store_type: Optional[StoreType]
     publishing_status: Optional[str]
+    destination_type: Optional[DestinationType]
     display_name: Optional[str]
 
 
@@ -222,11 +222,11 @@ class BasicReleaseDetailsResponse:
 
     identifier: int
     version: str
-    origin: ReleaseOrigin
+    origin: Optional[ReleaseOrigin]
     short_version: str
     enabled: bool
     uploaded_at: datetime.datetime
-    destinations: List[Destination]
+    destinations: Optional[List[Destination]]
     build: Optional[BuildInfo]
 
 
@@ -362,8 +362,8 @@ class ReleaseUploadBeginResponse:
 
 
 class ReleaseUploadEndResponse:
-    release_id: str
-    release_url: str
+    release_id: Optional[str]
+    release_url: Optional[str]
 
 
 @deserialize.key("identifier", "id")

@@ -41,10 +41,11 @@ class LibraryTests(unittest.TestCase):
     def test_construction(self):
         """Test construction."""
         client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
+        start_time = datetime.datetime.now() - datetime.timedelta(days=10)
         for group in client.crashes.get_error_groups(
             owner_name=LibraryTests.OWNER_NAME,
             app_name=LibraryTests.APP_NAME,
-            start_time=datetime.datetime(2019, 9, 20, 12, 0, 0),
+            start_time=start_time,
             order_by="count desc",
             limit=1,
         ):
@@ -59,19 +60,28 @@ class LibraryTests(unittest.TestCase):
             errors = client.crashes.errors_in_group(
                 owner_name=LibraryTests.OWNER_NAME,
                 app_name=LibraryTests.APP_NAME,
-                start_time=datetime.datetime(2019, 9, 20, 12, 0, 0),
+                start_time=start_time,
                 error_group_id=group.errorGroupId,
             )
 
             has_errors = False
             for error in errors:
-                full_details = client.crashes.error_details(
+                details = client.crashes.error_details(
+                    owner_name=LibraryTests.OWNER_NAME,
+                    app_name=LibraryTests.APP_NAME,
+                    error_group_id=group.errorGroupId,
+                    error_id=error.errorId,
+                )
+                self.assertIsNotNone(details)
+
+                full_details = client.crashes.error_info_dictionary(
                     owner_name=LibraryTests.OWNER_NAME,
                     app_name=LibraryTests.APP_NAME,
                     error_group_id=group.errorGroupId,
                     error_id=error.errorId,
                 )
                 self.assertIsNotNone(full_details)
+
                 has_errors = True
                 break
 

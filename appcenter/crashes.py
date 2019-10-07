@@ -6,7 +6,7 @@
 import datetime
 import logging
 import os
-from typing import Iterator, Optional
+from typing import Any, Dict, Iterator, Optional
 import urllib.parse
 
 from azure.storage.blob import BlockBlobService
@@ -75,6 +75,29 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         response = self.get(request_url, retry_count=3)
 
         return deserialize.deserialize(HandledErrorDetails, response.json())
+
+    def error_info_dictionary(
+        self, *, owner_name: str, app_name: str, error_group_id: str, error_id: str
+    ) -> HandledErrorDetails:
+        """Get the full error info dictionary.
+
+        This is the full details that App Center has on a crash. It is not
+        parsed due to being different per platform.
+
+        :param str owner_name: The name of the app account owner
+        :param str app_name: The name of the app
+        :param str error_group_id: The ID of the error group to get the details for
+        :param str error_id: The ID of the error to get the details for
+
+        :returns: The raw full error info dictionary
+        """
+
+        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
+
+        response = self.get(request_url, retry_count=3)
+
+        return deserialize.deserialize(Dict[str, Any], response.json())
 
     def set_annotation(
         self,

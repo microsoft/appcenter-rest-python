@@ -226,7 +226,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         owner_name: str,
         app_name: str,
         error_group_id: str,
-        start_time: datetime.datetime,
+        start_time: Optional[datetime.datetime] = None,
         end_time: Optional[datetime.datetime] = None,
         model: Optional[str] = None,
         operating_system: Optional[str] = None,
@@ -236,7 +236,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
         :param str error_group_id: The ID of the group to get the errors from
-        :param datetime.datetime start_time: The time to start getting error groups from
+        :param Optional[datetime.datetime] start_time: The time to start getting error groups from
         :param Optional[datetime.datetime] end_time: The end time to get error groups from
         :param Optional[str] model: The device model to restrict the search to (if any)
         :param Optional[str] operating_system: The OS to restrict the search to (if any)
@@ -247,7 +247,10 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors?"
 
-        parameters = {"start": start_time.replace(microsecond=0).isoformat()}
+        parameters: Dict[str, str] = {}
+
+        if start_time:
+            parameters["start"] = start_time.replace(microsecond=0).isoformat()
 
         if end_time:
             parameters["end"] = end_time.replace(microsecond=0).isoformat()

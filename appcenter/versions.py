@@ -225,7 +225,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         mandatory_update: bool = False,
         notify_testers: bool = False,
     ) -> ReleaseDestinationResponse:
-        """Get the App Center release identifier for the app version (usually build number).
+        """Release a build to a group.
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
@@ -273,6 +273,67 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         self.patch(request_url, data=release_update_request.json())
 
+    def upload_build(
+        self,
+        *,
+        owner_name: str,
+        app_name: str,
+        version: str,
+        build_number: str,
+        binary_path: str,
+        release_notes: str,
+        branch_name: Optional[str] = None,
+        commit_hash: Optional[str] = None,
+        commit_message: Optional[str] = None,
+    ) -> Optional[str]:
+        """Get the App Center release identifier for the app version (usually build number).
+
+        :param str owner_name: The name of the app account owner
+        :param str app_name: The name of the app
+        :param str version: The app version
+        :param str build_number: The build number
+        :param str binary_path: The path to the binary to upload
+        :param str release_notes: The release notes for the release
+        :param Optional[str] branch_name: The git branch that the build came from
+        :param Optional[str] commit_hash: The hash of the commit that was just built
+        :param Optional[str] commit_message: The message of the commit that was just built
+
+        :raises FileNotFoundError: If the supplied binary is not found
+        :raises Exception: If we don't get a release ID back after upload
+
+        :returns: The release details
+        """
+
+        if not os.path.exists(binary_path):
+            raise FileNotFoundError(f"Could not find binary: {binary_path}")
+
+        upload_begin_response = self.get_upload_url(
+            owner_name=owner_name, app_name=app_name, version=version, build_number=build_number
+        )
+
+        self.upload_binary(upload_url_response=upload_begin_response, binary_path=binary_path)
+
+        upload_end_response = self.commit_upload(
+            owner_name=owner_name, app_name=app_name, upload_id=upload_begin_response.upload_id
+        )
+
+        if upload_end_response.release_id is None:
+            raise Exception(f"Failed to get release ID for upload")
+
+        build_info = BuildInfo(
+            branch_name=branch_name, commit_hash=commit_hash, commit_message=commit_message
+        )
+        update_request = ReleaseUpdateRequest(release_notes=release_notes, build=build_info)
+
+        self.update_release(
+            owner_name=owner_name,
+            app_name=app_name,
+            release_id=upload_end_response.release_id,
+            release_update_request=update_request,
+        )
+
+        return upload_end_response.release_id
+
     def upload_and_release(
         self,
         *,
@@ -306,45 +367,23 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The release details
         """
 
-        # pylint: disable=too-many-locals
-
-        if not os.path.exists(binary_path):
-            raise FileNotFoundError(f"Could not find binary: {binary_path}")
-
-        upload_begin_response = self.get_upload_url(
-            owner_name=owner_name, app_name=app_name, version=version, build_number=build_number
-        )
-
-        self.upload_binary(upload_url_response=upload_begin_response, binary_path=binary_path)
-
-        upload_end_response = self.commit_upload(
-            owner_name=owner_name, app_name=app_name, upload_id=upload_begin_response.upload_id
-        )
-
-        if upload_end_response.release_id is None:
-            raise Exception(f"Failed to get release ID for upload")
-
-        build_info = BuildInfo(
-            branch_name=branch_name, commit_hash=commit_hash, commit_message=commit_message
-        )
-        update_request = ReleaseUpdateRequest(release_notes=release_notes, build=build_info)
-
-        self.update_release(
+        release_id = self.upload_build(
             owner_name=owner_name,
             app_name=app_name,
-            release_id=upload_end_response.release_id,
-            release_update_request=update_request,
+            version=version,
+            build_number=build_number,
+            binary_path=binary_path,
+            release_notes=release_notes,
+            branch_name=branch_name,
+            commit_hash=commit_hash,
+            commit_message=commit_message,
         )
+
+        if release_id is None:
+            raise Exception("Did not get release ID after upload")
 
         self.release(
-            owner_name=owner_name,
-            app_name=app_name,
-            release_id=upload_end_response.release_id,
-            group_id=group_id,
+            owner_name=owner_name, app_name=app_name, release_id=release_id, group_id=group_id
         )
 
-        return self.release_details(
-            owner_name=owner_name, app_name=app_name, release_id=upload_end_response.release_id
-        )
-
-        # pylint: enable=too-many-locals
+        return self.release_details(owner_name=owner_name, app_name=app_name, release_id=release_id)

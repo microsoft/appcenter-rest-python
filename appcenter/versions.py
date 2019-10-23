@@ -5,7 +5,6 @@
 
 import logging
 import os
-import re
 from typing import Iterator, List, Optional
 import urllib.parse
 
@@ -135,24 +134,19 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The latest commit available on App Center
         """
 
-        # TODO This can be optimized to use the actual fields once uploads use them
-
         self.log.info(f"Getting latest commit for app: {owner_name}/{app_name}")
 
         for version in self.all(owner_name=owner_name, app_name=app_name):
+
             full_details = self.release_details(
                 owner_name=owner_name, app_name=app_name, release_id=str(version.identifier)
             )
 
-            if full_details.release_notes is None:
+            if full_details.build is None:
                 continue
 
-            # Find commit sha in notes field
-            matches = re.search("Commit: ([a-zA-Z0-9]+)", full_details.release_notes)
-
-            if matches:
-                version_match: str = matches.group(1).strip()
-                return version_match
+            if full_details.build.commit_hash is not None:
+                return full_details.build.commit_hash
 
         return None
 

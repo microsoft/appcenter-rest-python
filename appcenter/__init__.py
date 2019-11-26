@@ -13,6 +13,7 @@ from typing import Any, ClassVar, Dict, List, Optional
 
 import requests
 
+from appcenter.account import AppCenterAccountClient
 from appcenter.analytics import AppCenterAnalyticsClient
 from appcenter.crashes import AppCenterCrashesClient
 from appcenter.versions import AppCenterVersionsClient
@@ -27,6 +28,7 @@ class AppCenterClient:
     log: logging.Logger
     token: str
 
+    account: AppCenterAccountClient
     analytics: AppCenterAnalyticsClient
     crashes: AppCenterCrashesClient
     versions: AppCenterVersionsClient
@@ -42,6 +44,7 @@ class AppCenterClient:
             self.log = parent_logger.getChild("appcenter")
 
         self.token = access_token
+        self.account = AppCenterAccountClient(self.token, self.log)
         self.analytics = AppCenterAnalyticsClient(self.token, self.log)
         self.crashes = AppCenterCrashesClient(self.token, self.log)
         self.versions = AppCenterVersionsClient(self.token, self.log)

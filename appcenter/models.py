@@ -460,3 +460,44 @@ class SymbolUploadStatus(enum.Enum):
 
 class SymbolUploadEndRequest:
     status: SymbolUploadStatus
+
+
+class Origin(enum.Enum):
+    appcenter = "appcenter"
+    hockeyapp = "hockeyapp"
+    codepush = "codepush"
+
+
+class Permission(enum.Enum):
+    manager = "manager"
+    developer = "developer"
+    viewer = "viewer"
+    tester = "tester"
+
+
+@deserialize.key("identifier", "id")
+class User:
+
+    # The unique ID of the user
+    identifier: str
+
+    # The avatar URL of the user
+    avatar_url: Optional[str]
+
+    # User is required to send an old password in order to change the password
+    can_change_password: Optional[bool]
+
+    # The full name of the user. Might for example be first and last name
+    display_name: str
+
+    # The email address of the user
+    email: str
+
+    # The unique name that is used to identify the user
+    name: str
+
+    # The permissions the user has for the app
+    permissions: List[Permission]
+
+    # The creation origin of this user
+    origin: Origin

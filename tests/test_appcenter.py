@@ -219,3 +219,32 @@ class LibraryTests(unittest.TestCase):
         )
 
         self.assertEqual(details.annotation, annotation)
+
+    def test_users(self):
+        """Test construction."""
+        client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
+        users = client.account.users(
+            owner_name=LibraryTests.OWNER_NAME, app_name=LibraryTests.APP_NAME
+        )
+
+        self.assertTrue(len(users) > 0)
+
+        testers = list(
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.tester, users)
+        )
+        viewers = list(
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.viewer, users)
+        )
+        developers = list(
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.developer, users)
+        )
+        managers = list(
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.manager, users)
+        )
+
+        self.assertLessEqual(len(testers), len(users))
+        self.assertLessEqual(len(viewers), len(users))
+        self.assertLessEqual(len(developers), len(users))
+        self.assertLessEqual(len(managers), len(users))
+
+        self.assertEqual(len(testers) + len(viewers) + len(developers) + len(managers), len(users))

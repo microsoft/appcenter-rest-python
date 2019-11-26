@@ -475,6 +475,12 @@ class Permission(enum.Enum):
     tester = "tester"
 
 
+class Role(enum.Enum):
+    admin = "admin"
+    collaborator = "collaborator"
+    member = "member"
+
+
 @deserialize.key("identifier", "id")
 class User:
 

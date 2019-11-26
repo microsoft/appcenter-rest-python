@@ -128,6 +128,22 @@ class AppCenterDerivedClient:
 
         return response
 
+    def delete(self, url: str) -> requests.Response:
+        """Perform a DELETE request to a url
+
+        :param url: The URL to run the DELETE on
+
+        :returns: The raw response
+
+        :raises Exception: If the request fails with a non 200 status code
+        """
+        response = requests.delete(url, headers={"X-API-Token": self.token})
+
+        if response.status_code < 200 or response.status_code >= 300:
+            raise Exception(f"App Center request failed: {url} Error: {response.text}")
+
+        return response
+
     def azure_blob_upload(self, url: str, *, file_stream: BinaryIO) -> requests.Response:
         """Upload a file to an Azure Blob Storage URL
 

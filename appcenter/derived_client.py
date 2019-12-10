@@ -15,6 +15,28 @@ from appcenter.constants import API_BASE_URL
 ProgressCallback = Callable[[int, Optional[int]], None]
 
 
+class AppCenterHTTPException(Exception):
+    """All App Center HTTP exceptions use this class.
+
+    :param message: The message for the exception
+    :param response: The response to the HTTP request
+    """
+
+    message: str
+    response: requests.Response
+
+    def __init__(self, message: str, response: requests.Response) -> None:
+        super().__init__()
+        self.message = message
+        self.response = response
+
+    def __str__(self) -> str:
+        """Generate and return the string representation of the object.
+        :return: A string representation of the object
+        """
+        return f"{self.message}, status_code={self.response.status_code}, text={self.response.text}"
+
+
 class AppCenterDerivedClient:
     """Base definition for App Center clients.
 
@@ -52,7 +74,7 @@ class AppCenterDerivedClient:
 
         :returns: The raw response
 
-        :raises Exception: If the request fails with a non 200 status code
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = requests.get(url, headers={"X-API-Token": self.token})
 
@@ -64,7 +86,7 @@ class AppCenterDerivedClient:
             return self.get(url, retry_count=retry_count - 1)
 
         if response.status_code != 200:
-            raise Exception(f"App Center request failed: {url} Error: {response.text}")
+            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
 
         return response
 
@@ -76,14 +98,14 @@ class AppCenterDerivedClient:
 
         :returns: The raw response
 
-        :raises Exception: If the request fails with a non 200 status code
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = requests.patch(
             url, headers={"X-API-Token": self.token, "Content-Type": "application/json"}, json=data
         )
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise Exception(f"App Center request failed: {url} Error: {response.text}")
+            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
 
         return response
 
@@ -95,14 +117,14 @@ class AppCenterDerivedClient:
 
         :returns: The raw response
 
-        :raises Exception: If the request fails with a non 200 status code
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = requests.post(
             url, headers={"X-API-Token": self.token, "Content-Type": "application/json"}, json=data
         )
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise Exception(f"App Center request failed: {url} Error: {response.text}")
+            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
 
         return response
 
@@ -116,7 +138,7 @@ class AppCenterDerivedClient:
 
         :returns: The raw response
 
-        :raises Exception: If the request fails with a non 200 status code
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
 
         response = requests.post(
@@ -124,7 +146,7 @@ class AppCenterDerivedClient:
         )
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise Exception(f"App Center file post request failed: {url} Error: {response.text}")
+            raise AppCenterHTTPException(f"App Center file post request failed: {url} Error: {response.text}", response)
 
         return response
 
@@ -135,12 +157,12 @@ class AppCenterDerivedClient:
 
         :returns: The raw response
 
-        :raises Exception: If the request fails with a non 200 status code
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = requests.delete(url, headers={"X-API-Token": self.token})
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise Exception(f"App Center request failed: {url} Error: {response.text}")
+            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
 
         return response
 
@@ -152,7 +174,7 @@ class AppCenterDerivedClient:
 
         :returns: The raw response
 
-        :raises Exception: If the request fails with a non 200 status code
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
 
         response = requests.put(
@@ -163,6 +185,6 @@ class AppCenterDerivedClient:
 
         if response.status_code < 200 or response.status_code >= 300:
             self.log.debug("Azure URL: " + url)
-            raise Exception(f"Azure file upload request failed: Error: {response.text}")
+            raise AppCenterHTTPException(f"Azure file upload request failed: Error: {response.text}", response)
 
         return response

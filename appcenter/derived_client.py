@@ -86,7 +86,9 @@ class AppCenterDerivedClient:
             return self.get(url, retry_count=retry_count - 1)
 
         if response.status_code != 200:
-            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
+            raise AppCenterHTTPException(
+                f"App Center request failed: {url} Error: {response.text}", response
+            )
 
         return response
 
@@ -105,7 +107,9 @@ class AppCenterDerivedClient:
         )
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
+            raise AppCenterHTTPException(
+                f"App Center request failed: {url} Error: {response.text}", response
+            )
 
         return response
 
@@ -124,7 +128,9 @@ class AppCenterDerivedClient:
         )
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
+            raise AppCenterHTTPException(
+                f"App Center request failed: {url} Error: {response.text}", response
+            )
 
         return response
 
@@ -146,7 +152,9 @@ class AppCenterDerivedClient:
         )
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(f"App Center file post request failed: {url} Error: {response.text}", response)
+            raise AppCenterHTTPException(
+                f"App Center file post request failed: {url} Error: {response.text}", response
+            )
 
         return response
 
@@ -162,7 +170,9 @@ class AppCenterDerivedClient:
         response = requests.delete(url, headers={"X-API-Token": self.token})
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(f"App Center request failed: {url} Error: {response.text}", response)
+            raise AppCenterHTTPException(
+                f"App Center request failed: {url} Error: {response.text}", response
+            )
 
         return response
 
@@ -185,6 +195,8 @@ class AppCenterDerivedClient:
 
         if response.status_code < 200 or response.status_code >= 300:
             self.log.debug("Azure URL: " + url)
-            raise AppCenterHTTPException(f"Azure file upload request failed: Error: {response.text}", response)
+            raise AppCenterHTTPException(
+                f"Azure file upload request failed: Error: {response.text}", response
+            )
 
         return response

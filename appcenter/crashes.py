@@ -355,6 +355,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         owner_name: str,
         app_name: str,
         symbols_path: str,
+        symbols_name: Optional[str] = None,
         symbol_type: SymbolType,
         build_number: Optional[str] = None,
         version: Optional[str] = None,
@@ -365,6 +366,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
         :param str symbols_path: The path to the symbols
+        :param str symbols_name: The name to use for the symbols (defaults to file basename)
         :param str symbol_type: The type of symbols being uploaded
         :param Optional[str] build_number: The build number (required for Android)
         :param Optional[str] version: The build version (required for Android)
@@ -377,10 +379,13 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :raises Exception: If something goes wrong
         """
 
+        if not symbols_name:
+            symbols_name = os.path.basename(symbols_path)
+
         begin_upload_response = self.begin_symbol_upload(
             owner_name=owner_name,
             app_name=app_name,
-            symbols_name=os.path.basename(symbols_path),
+            symbols_name=symbols_name,
             symbol_type=symbol_type,
             build_number=build_number,
             version=version,

@@ -5,9 +5,13 @@
 
 import logging
 import time
-from typing import Any, Callable, Dict, Optional, Tuple, BinaryIO
+from typing import Any, BinaryIO, Callable, Dict, Optional, Tuple
+from urllib3.util.retry import Retry
 
+import deserialize
 import requests
+from requests.adapters import HTTPAdapter
+
 
 from appcenter.constants import API_BASE_URL
 
@@ -15,26 +19,81 @@ from appcenter.constants import API_BASE_URL
 ProgressCallback = Callable[[int, Optional[int]], None]
 
 
-class AppCenterHTTPException(Exception):
-    """All App Center HTTP exceptions use this class.
+class AppCenterHTTPError:
+    """Represents the response for a HTTP error."""
 
-    :param message: The message for the exception
-    :param response: The response to the HTTP request
-    """
-
+    code: str
     message: str
+
+
+class AppCenterHTTPException(Exception):
+    """All App Center HTTP exceptions use this class."""
+
     response: requests.Response
 
-    def __init__(self, message: str, response: requests.Response) -> None:
+    def __init__(self, response: requests.Response) -> None:
+        """Create a new AppCenterHTTPException
+
+        :param response: The response to the HTTP request
+        """
+
         super().__init__()
-        self.message = message
         self.response = response
 
     def __str__(self) -> str:
         """Generate and return the string representation of the object.
         :return: A string representation of the object
         """
-        return f"{self.message}, status_code={self.response.status_code}, text={self.response.text}"
+        return (
+            f"method={self.response.request.method}, "
+            + f"url={self.response.request.url}, "
+            + f"status_code={self.response.status_code}, "
+            + f"text={self.response.text}"
+        )
+
+
+class AppCenterDecodedHTTPException(AppCenterHTTPException):
+    """An App Center HTTP exception where we managed to decode the response."""
+
+    error: AppCenterHTTPError
+
+    def __init__(self, response: requests.Response, error: AppCenterHTTPError) -> None:
+        """Create a new AppCenterDecodedHTTPException.
+
+        :param response: The response to the HTTP request
+        :param error: The decoded error
+        """
+
+        super().__init__(response)
+        self.error = error
+
+    def __str__(self) -> str:
+        """Generate and return the string representation of the object.
+        :return: A string representation of the object
+        """
+        return (
+            f"method={self.response.request.method}, "
+            + f"url={self.response.request.url}, "
+            + f"status_code={self.response.status_code}, "
+            + f"error={self.error}"
+        )
+
+
+def create_exception(response: requests.Response) -> AppCenterHTTPException:
+    """Create the exception for a response.
+
+    :param request: The original request
+    :param response: The response from App Center
+
+    :returns: The constructed exception
+    """
+    try:
+        response_json = response.json()
+        return AppCenterDecodedHTTPException(
+            response, deserialize.deserialize(AppCenterHTTPError, response_json)
+        )
+    except Exception:
+        return AppCenterHTTPException(response)
 
 
 class AppCenterDerivedClient:
@@ -47,10 +106,19 @@ class AppCenterDerivedClient:
 
     log: logging.Logger
     token: str
+    session: requests.Session
 
     def __init__(self, name: str, token: str, parent_logger: logging.Logger) -> None:
         self.log = parent_logger.getChild(name)
         self.token = token
+        self.session = requests.Session()
+        self.session.headers.update({"X-API-Token": self.token})
+        retry = Retry(
+            total=3, read=3, connect=3, backoff_factor=2, status_forcelist=(500, 502, 503, 504, 599)
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
 
     def generate_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
         """Generate a URL to use for querying the API.
@@ -66,29 +134,31 @@ class AppCenterDerivedClient:
         self.log.debug(f"Generated URL: {url}")
         return url
 
-    def get(self, url: str, *, retry_count: int = 0) -> requests.Response:
+    def get(self, url: str) -> requests.Response:
         """Perform a GET request to a url
 
         :param url: The URL to run the GET on
-        :param int retry_count: The number of retries remaining if we got a 202 last time
 
         :returns: The raw response
 
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
-        response = requests.get(url, headers={"X-API-Token": self.token})
 
-        if response.status_code == 202 and retry_count > 0:
-            self.log.info(
-                f"202 response. Sleeping for 10 seconds before invoking App Center again..."
-            )
-            time.sleep(10)
-            return self.get(url, retry_count=retry_count - 1)
+        # For a GET we also need to retry on a 202
+        attempts = 0
+        while attempts < 3:
+            attempts += 1
 
-        if response.status_code != 200:
-            raise AppCenterHTTPException(
-                f"App Center request failed: {url} Error: {response.text}", response
-            )
+            response = self.session.get(url)
+
+            if response.status_code == 202 and attempts < 3:
+                time.sleep(10)
+                continue
+
+            if response.status_code != 200:
+                raise create_exception(response)
+
+            break
 
         return response
 
@@ -102,14 +172,10 @@ class AppCenterDerivedClient:
 
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
-        response = requests.patch(
-            url, headers={"X-API-Token": self.token, "Content-Type": "application/json"}, json=data
-        )
+        response = self.session.patch(url, headers={"Content-Type": "application/json"}, json=data)
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(
-                f"App Center request failed: {url} Error: {response.text}", response
-            )
+            raise create_exception(response)
 
         return response
 
@@ -123,14 +189,10 @@ class AppCenterDerivedClient:
 
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
-        response = requests.post(
-            url, headers={"X-API-Token": self.token, "Content-Type": "application/json"}, json=data
-        )
+        response = self.session.post(url, headers={"Content-Type": "application/json"}, json=data)
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(
-                f"App Center request failed: {url} Error: {response.text}", response
-            )
+            raise create_exception(response)
 
         return response
 
@@ -147,14 +209,10 @@ class AppCenterDerivedClient:
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
 
-        response = requests.post(
-            url, headers={"X-API-Token": self.token}, files=files, timeout=20 * 60
-        )
+        response = self.session.post(url, files=files, timeout=20 * 60)
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(
-                f"App Center file post request failed: {url} Error: {response.text}", response
-            )
+            raise create_exception(response)
 
         return response
 
@@ -167,12 +225,10 @@ class AppCenterDerivedClient:
 
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
-        response = requests.delete(url, headers={"X-API-Token": self.token})
+        response = self.session.delete(url)
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise AppCenterHTTPException(
-                f"App Center request failed: {url} Error: {response.text}", response
-            )
+            raise create_exception(response)
 
         return response
 
@@ -180,7 +236,7 @@ class AppCenterDerivedClient:
         """Upload a file to an Azure Blob Storage URL
 
         :param url: The URL to upload to
-        :param file_strea: The stream to the file contents
+        :param file_stream: The stream to the file contents
 
         :returns: The raw response
 
@@ -195,8 +251,6 @@ class AppCenterDerivedClient:
 
         if response.status_code < 200 or response.status_code >= 300:
             self.log.debug("Azure URL: " + url)
-            raise AppCenterHTTPException(
-                f"Azure file upload request failed: Error: {response.text}", response
-            )
+            raise create_exception(response)
 
         return response

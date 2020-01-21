@@ -52,7 +52,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
-        response = self.get(request_url, retry_count=3)
+        response = self.get(request_url)
 
         return deserialize.deserialize(ErrorGroup, response.json())
 
@@ -72,7 +72,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}"
 
-        response = self.get(request_url, retry_count=3)
+        response = self.get(request_url)
 
         return deserialize.deserialize(HandledErrorDetails, response.json())
 
@@ -95,7 +95,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
 
-        response = self.get(request_url, retry_count=3)
+        response = self.get(request_url)
 
         return deserialize.deserialize(Dict[str, Any], response.json())
 
@@ -127,7 +127,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
             request_url += f"/errors/errorGroups/{error_group_id}"
 
-            response = self.get(request_url, retry_count=3)
+            response = self.get(request_url)
 
             group = deserialize.deserialize(ErrorGroup, response.json())
             state = group.state
@@ -205,7 +205,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             self.log.info(f"Fetching page {page} of crash groups")
 
-            response = self.get(request_url, retry_count=3)
+            response = self.get(request_url)
 
             error_groups = deserialize.deserialize(ErrorGroups, response.json())
 
@@ -271,7 +271,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             self.log.info(f"Fetching page {page} of crashes for group {error_group_id}")
 
-            response = self.get(request_url, retry_count=3)
+            response = self.get(request_url)
 
             errors = deserialize.deserialize(HandledErrors, response.json())
 

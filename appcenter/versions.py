@@ -46,7 +46,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/recent_releases"
 
-        response = self.get(request_url, retry_count=3)
+        response = self.get(request_url)
 
         return deserialize.deserialize(List[BasicReleaseDetailsResponse], response.json())
 
@@ -82,7 +82,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         request_url += urllib.parse.urlencode(parameters)
 
-        response = self.get(request_url, retry_count=3)
+        response = self.get(request_url)
 
         return deserialize.deserialize(List[BasicReleaseDetailsResponse], response.json())
 
@@ -103,7 +103,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/releases/{release_id}?"
 
-        response = self.get(request_url, retry_count=3)
+        response = self.get(request_url)
 
         return deserialize.deserialize(ReleaseDetailsResponse, response.json())
 

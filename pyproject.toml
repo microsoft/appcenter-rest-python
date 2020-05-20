@@ -30,6 +30,7 @@ python = "^3.6"
 azure-storage-blob = "^2.1.0"
 deserialize = "^1"
 requests = "^2.22.0"
+tenacity = "^6.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "=19.3b0"

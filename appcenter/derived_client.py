@@ -4,13 +4,11 @@
 # Licensed under the MIT license.
 
 import logging
-import time
 from typing import Any, BinaryIO, Callable, Dict, Optional, Tuple
-from urllib3.util.retry import Retry
 
 import deserialize
 import requests
-from requests.adapters import HTTPAdapter
+from tenacity import retry, retry_if_exception, retry_if_result, stop_after_attempt, wait_fixed
 
 
 from appcenter.constants import API_BASE_URL
@@ -96,6 +94,21 @@ def create_exception(response: requests.Response) -> AppCenterHTTPException:
         return AppCenterHTTPException(response)
 
 
+def _is_connection_failure(exception: Exception) -> bool:
+    exception_checks = [
+        "Operation timed out",
+        "Connection aborted.",
+        "bad handshake: ",
+        "Failed to establish a new connection",
+    ]
+
+    for check in exception_checks:
+        if check in str(exception):
+            return True
+
+    return False
+
+
 class AppCenterDerivedClient:
     """Base definition for App Center clients.
 
@@ -113,12 +126,6 @@ class AppCenterDerivedClient:
         self.token = token
         self.session = requests.Session()
         self.session.headers.update({"X-API-Token": self.token})
-        retry = Retry(
-            total=3, read=3, connect=3, backoff_factor=2, status_forcelist=(500, 502, 503, 504, 599)
-        )
-        adapter = HTTPAdapter(max_retries=retry)
-        self.session.mount("http://", adapter)
-        self.session.mount("https://", adapter)
 
     def generate_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
         """Generate a URL to use for querying the API.
@@ -134,6 +141,16 @@ class AppCenterDerivedClient:
         self.log.debug(f"Generated URL: {url}")
         return url
 
+    @retry(
+        retry=(
+            retry_if_exception(_is_connection_failure)
+            | retry_if_result(
+                lambda response: response.status_code == 202
+            )  # For a GET we also need to retry on a 202
+        ),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def get(self, url: str) -> requests.Response:
         """Perform a GET request to a url
 
@@ -144,24 +161,18 @@ class AppCenterDerivedClient:
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
 
-        # For a GET we also need to retry on a 202
-        attempts = 0
-        while attempts < 3:
-            attempts += 1
+        response = self.session.get(url)
 
-            response = self.session.get(url)
-
-            if response.status_code == 202 and attempts < 3:
-                time.sleep(10)
-                continue
-
-            if response.status_code != 200:
-                raise create_exception(response)
-
-            break
+        if response.status_code != 200:
+            raise create_exception(response)
 
         return response
 
+    @retry(
+        retry=(retry_if_exception(_is_connection_failure)),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def patch(self, url: str, *, data: Any) -> requests.Response:
         """Perform a PATCH request to a url
 
@@ -179,6 +190,11 @@ class AppCenterDerivedClient:
 
         return response
 
+    @retry(
+        retry=(retry_if_exception(_is_connection_failure)),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def post(self, url: str, *, data: Any) -> requests.Response:
         """Perform a POST request to a url
 
@@ -196,6 +212,11 @@ class AppCenterDerivedClient:
 
         return response
 
+    @retry(
+        retry=(retry_if_exception(_is_connection_failure)),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def post_files(self, url: str, *, files: Dict[str, Tuple[str, BinaryIO]]) -> requests.Response:
         """Perform a POST request to a url, sending files
 
@@ -216,6 +237,11 @@ class AppCenterDerivedClient:
 
         return response
 
+    @retry(
+        retry=(retry_if_exception(_is_connection_failure)),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def delete(self, url: str) -> requests.Response:
         """Perform a DELETE request to a url
 
@@ -232,6 +258,11 @@ class AppCenterDerivedClient:
 
         return response
 
+    @retry(
+        retry=(retry_if_exception(_is_connection_failure)),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def azure_blob_upload(self, url: str, *, file_stream: BinaryIO) -> requests.Response:
         """Upload a file to an Azure Blob Storage URL
 

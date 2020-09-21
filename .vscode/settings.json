@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "${workspaceFolder}/bin/python3",
+    "python.pythonPath": "venv/bin/python3",
     "python.testing.pytestArgs": [
         "tests"
     ],

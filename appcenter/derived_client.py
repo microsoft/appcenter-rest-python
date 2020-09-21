@@ -23,6 +23,12 @@ class AppCenterHTTPError:
     code: str
     message: str
 
+    def __str__(self) -> str:
+        """Generate and return the string representation of the object.
+        :return: A string representation of the object
+        """
+        return f"<code={self.code}, message={self.message}>"
+
 
 class AppCenterHTTPException(Exception):
     """All App Center HTTP exceptions use this class."""
@@ -43,10 +49,10 @@ class AppCenterHTTPException(Exception):
         :return: A string representation of the object
         """
         return (
-            f"method={self.response.request.method}, "
+            f"<method={self.response.request.method}, "
             + f"url={self.response.request.url}, "
             + f"status_code={self.response.status_code}, "
-            + f"text={self.response.text}"
+            + f"text={self.response.text}>"
         )
 
 

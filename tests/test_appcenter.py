@@ -41,7 +41,11 @@ class LibraryTests(unittest.TestCase):
     def test_construction(self):
         """Test construction."""
         client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
-        start_time = datetime.datetime.now() - datetime.timedelta(days=10)
+        start_time = datetime.datetime.now() - datetime.timedelta(days=10)        
+        # Test to fetch at least 2 error group batches
+        ERROR_GROUP_BATCH_LIMIT = 2
+        error_group_batch_count = 0
+
         for group in client.crashes.get_error_groups(
             owner_name=LibraryTests.OWNER_NAME,
             app_name=LibraryTests.APP_NAME,
@@ -86,7 +90,11 @@ class LibraryTests(unittest.TestCase):
                 break
 
             self.assertTrue(has_errors)
-            break
+
+            error_group_batch_count += 1
+            
+            if error_group_batch_count == ERROR_GROUP_BATCH_LIMIT:
+                break
 
     def test_recent(self):
         """Test recent."""

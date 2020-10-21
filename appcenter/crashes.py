@@ -214,7 +214,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             if error_groups.nextLink is None:
                 break
 
-            request_url = appcenter.constants.API_BASE_URL + self._next_link_polished(error_groups.nextLink, owner_name, app_name)
+            request_url = appcenter.constants.API_BASE_URL + self._next_link_polished(
+                error_groups.nextLink, owner_name, app_name
+            )
 
         # pylint: disable=too-many-locals
 
@@ -278,7 +280,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             if errors.nextLink is None:
                 break
 
-            request_url = appcenter.constants.API_BASE_URL + self._next_link_polished(errors.nextLink, owner_name, app_name)
+            request_url = appcenter.constants.API_BASE_URL + self._next_link_polished(
+                errors.nextLink, owner_name, app_name
+            )
 
     def begin_symbol_upload(
         self,
@@ -409,13 +413,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         if commit_response.status != SymbolUploadStatus.committed:
             raise Exception("Failed to upload symbols")
 
-
-    def _next_link_polished(
-        self,
-        next_link: str, 
-        owner_name: str, 
-        app_name: str
-    ) -> str:
+    def _next_link_polished(self, next_link: str, owner_name: str, app_name: str) -> str:
         """Polish nextLink string gotten from AppCenter service
 
         :param str next_link: The nextLink property from a service response when items are queried in batches
@@ -425,9 +423,11 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: A polished next link to use on next batch
         """
 
+        _ = self
+
         if f"{owner_name}/{app_name}" not in next_link:
             # For some apps, AppCenter is returning invalid nextLinks without app name and owner, just a // instead.
             next_link = next_link.replace("//", f"/{owner_name}/{app_name}/", 1)
-        
+
         # AppCenter is returning a nextLink with a /api on the URL which causes the request to fail.
         return next_link.replace("/api", "", 1)

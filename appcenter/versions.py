@@ -5,6 +5,7 @@
 
 import logging
 import os
+import time
 from typing import Iterator, List, Optional
 import urllib.parse
 
@@ -168,7 +169,19 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         data = {"release_id": 0, "build_version": version, "build_number": build_number}
 
-        response = self.post(request_url, data=data)
+        for attempt in range(3):
+            self.log.debug(f"Attempting post {attempt}/3 in get_upload_url")
+            try:
+                response = self.post(request_url, data=data)
+                if response.ok:
+                    break
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to post in get_upload_url: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
 
         return deserialize.deserialize(ReleaseUploadBeginResponse, response.json())
 
@@ -185,8 +198,20 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         with open(binary_path, "rb") as binary_file:
             files = {"ipa": (os.path.basename(binary_path), binary_file)}
-            # Nothing to do with the response since we've already validated it
-            self.post_files(url=upload_url_response.upload_url, files=files)
+
+            for attempt in range(3):
+                self.log.debug(f"Attempting post {attempt}/3 in upload_binary")
+                try:
+                    response = self.post_files(url=upload_url_response.upload_url, files=files)
+                    if response.ok:
+                        break
+                except Exception as ex:
+                    if attempt < 2:
+                        self.log.warning(f"Failed to post in upload_binary: {ex}")
+                        self.log.warning("Will wait 10 seconds and try again")
+                        time.sleep(10)
+                    else:
+                        raise
 
     def commit_upload(
         self, *, owner_name: str, app_name: str, upload_id: str
@@ -205,7 +230,19 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         data = {"status": "committed"}
 
-        response = self.patch(request_url, data=data)
+        for attempt in range(3):
+            self.log.debug(f"Attempting patch {attempt}/3 in commit_upload")
+            try:
+                response = self.patch(request_url, data=data)
+                if response.ok:
+                    break
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to patch in commit_upload: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
 
         return deserialize.deserialize(ReleaseUploadEndResponse, response.json())
 
@@ -240,7 +277,19 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             "notify_testers": notify_testers,
         }
 
-        response = self.post(request_url, data=data)
+        for attempt in range(3):
+            self.log.debug(f"Attempting post {attempt}/3 in release")
+            try:
+                response = self.post(request_url, data=data)
+                if response.ok:
+                    break
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to post in release: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
 
         return deserialize.deserialize(ReleaseDestinationResponse, response.json())
 
@@ -265,7 +314,19 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/releases/{release_id}"
 
-        self.patch(request_url, data=release_update_request.json())
+        for attempt in range(3):
+            self.log.debug(f"Attempting patch {attempt}/3 in update_release")
+            try:
+                response = self.patch(request_url, data=release_update_request.json())
+                if response.ok:
+                    break
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to patch in update_release: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
 
     def upload_build(
         self,

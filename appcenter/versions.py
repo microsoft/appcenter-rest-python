@@ -575,7 +575,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             raise FileNotFoundError(f"Could not find binary: {binary_path}")
 
         create_release_upload_response = self.get_upload_url(
-            owner_name=owner_name, app_name=app_name, version=version, build_number=build_number
+            owner_name=owner_name, app_name=app_name
         )
 
         success = self.upload_binary(

@@ -15,12 +15,35 @@ from appcenter.derived_client import AppCenterDerivedClient
 from appcenter.models import (
     BasicReleaseDetailsResponse,
     BuildInfo,
+    ChunkUploadResponse,
     ReleaseDetailsResponse,
-    ReleaseUploadBeginResponse,
-    ReleaseUploadEndResponse,
+    CreateReleaseUploadResponse,
+    CommitUploadResponse,
     ReleaseDestinationResponse,
     ReleaseUpdateRequest,
+    SetUploadMetadataResponse,
+    UploadCompleteResponse,
 )
+
+
+# From https://github.com/microsoft/appcenter-cli/blob/master/appcenter-file-upload-client-node/src/ac-fus-mime-types.ts
+MIME_TYPES = {
+    "apk": "application/vnd.android.package-archive",
+    "aab": "application/vnd.android.package-archive",
+    "msi": "application/x-msi",
+    "plist": "application/xml",
+    "aetx": "application/c-x509-ca-cert",
+    "cer": "application/pkix-cert",
+    "xap": "application/x-silverlight-app",
+    "appx": "application/x-appx",
+    "appxbundle": "application/x-appxbundle",
+    "appxupload": "application/x-appxupload",
+    "appxsym": "application/x-appxupload",
+    "msix": "application/x-msix",
+    "msixbundle": "application/x-msixbundle",
+    "msixupload": "application/x-msixupload",
+    "msixsym": "application/x-msixupload",
+}
 
 
 class AppCenterVersionsClient(AppCenterDerivedClient):
@@ -152,27 +175,23 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return None
 
     def get_upload_url(
-        self, *, owner_name: str, app_name: str, version: str, build_number: str
-    ) -> ReleaseUploadBeginResponse:
+        self, *, owner_name: str, app_name: str
+    ) -> CreateReleaseUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param str version: The app version
-        :param str build_number: The build number
 
         :returns: The App Center release identifier
         """
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/release_uploads"
-
-        data = {"release_id": 0, "build_version": version, "build_number": build_number}
+        request_url += f"/uploads/releases"
 
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in get_upload_url")
             try:
-                response = self.post(request_url, data=data)
+                response = self.post(request_url, data={})
                 if response.ok:
                     break
             except Exception as ex:
@@ -183,39 +202,179 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                 else:
                     raise
 
-        return deserialize.deserialize(ReleaseUploadBeginResponse, response.json())
+        return deserialize.deserialize(CreateReleaseUploadResponse, response.json())
 
-    def upload_binary(
-        self, *, upload_url_response: ReleaseUploadBeginResponse, binary_path: str
-    ) -> None:
-        """Upload a binary
+    def set_upload_metadata(
+        self, *, create_release_upload_response: CreateReleaseUploadResponse, binary_path: str
+    ) -> Optional[SetUploadMetadataResponse]:
+        """Set the metadata for a binary upload
 
-        :param ReleaseUploadBeginResponse upload_url_response: The response to a `get_upload_url` call
+        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
         :param binary_path: The path to the binary to upload
 
-        :returns: ?
+        :returns: The upload response if we manage to get one, None otherwise
+        """
+        file_size = os.path.getsize(binary_path)
+        file_name = os.path.basename(binary_path)
+        file_ext = os.path.splitext(file_name)[-1]
+        if file_ext.startswith("."):
+            file_ext = file_ext[1:]
+        mime_type = MIME_TYPES.get(file_ext)
+
+        request_url = create_release_upload_response.upload_domain
+        request_url += f"/upload/set_metadata/{create_release_upload_response.package_asset_id}?"
+
+        parameters = {"file_name": file_name, "file_size": file_size}
+
+        if mime_type:
+            parameters["content_type"] = mime_type
+
+        request_url += urllib.parse.urlencode(parameters)
+        request_url += "&token=" + create_release_upload_response.url_encoded_token
+
+        for attempt in range(3):
+            self.log.debug(f"Attempting post {attempt}/3 in set_upload_metadata")
+            try:
+                response = self.post(request_url, data={})
+                if response.ok:
+                    return deserialize.deserialize(SetUploadMetadataResponse, response.json())
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to post in set_upload_metadata: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
+
+        return None
+
+    def _upload_chunk(
+        self,
+        *,
+        chunk_number: int,
+        chunk: bytearray,
+        create_release_upload_response: CreateReleaseUploadResponse,
+    ) -> Optional[SetUploadMetadataResponse]:
+        """Set the metadata for a binary upload
+
+        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        :param binary_path: The path to the binary to upload
+
+        :returns: The upload response if we manage to get one, None otherwise
         """
 
-        with open(binary_path, "rb") as binary_file:
-            files = {"ipa": (os.path.basename(binary_path), binary_file)}
+        request_url = create_release_upload_response.upload_domain
+        request_url += f"/upload/upload_chunk/{create_release_upload_response.package_asset_id}?"
 
-            for attempt in range(3):
-                self.log.debug(f"Attempting post {attempt}/3 in upload_binary")
+        parameters = {"block_number": chunk_number}
+
+        request_url += urllib.parse.urlencode(parameters)
+        request_url += "&token=" + create_release_upload_response.url_encoded_token
+
+        for attempt in range(3):
+            self.log.debug(f"Attempting post {attempt}/3 in _upload_chunk")
+            try:
+                response = self.post_raw_data(url=request_url, data=chunk)
+                if response.ok:
+                    return deserialize.deserialize(ChunkUploadResponse, response.json())
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to post in _upload_chunk: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
+
+        return None
+
+    def _mark_upload_finished(
+        self, *, create_release_upload_response: CreateReleaseUploadResponse
+    ) -> UploadCompleteResponse:
+        """Mark the upload of a binary as finished
+
+        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        """
+
+        request_url = create_release_upload_response.upload_domain
+        request_url += f"/upload/finished/{create_release_upload_response.package_asset_id}?"
+
+        parameters = {"callback": ""}
+
+        request_url += urllib.parse.urlencode(parameters)
+        request_url += "&token=" + create_release_upload_response.url_encoded_token
+
+        for attempt in range(3):
+            self.log.debug(f"Attempting post {attempt}/3 in _mark_upload_finished")
+            try:
+                response = self.post_raw_data(request_url, data=None)
+                if response.ok:
+                    return deserialize.deserialize(UploadCompleteResponse, response.json())
+            except Exception as ex:
+                if attempt < 2:
+                    self.log.warning(f"Failed to post in _mark_upload_finished: {ex}")
+                    self.log.warning("Will wait 10 seconds and try again")
+                    time.sleep(10)
+                else:
+                    raise
+
+        return None
+
+    def upload_binary(
+        self, *, create_release_upload_response: CreateReleaseUploadResponse, binary_path: str
+    ) -> bool:
+        """Upload a binary
+
+        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        :param binary_path: The path to the binary to upload
+
+        :returns: True on success, False on failure
+        """
+
+        upload_metadata_response = self.set_upload_metadata(
+            create_release_upload_response=create_release_upload_response, binary_path=binary_path
+        )
+
+        with open(binary_path, "rb") as binary_file:
+
+            chunk_numbers = upload_metadata_response.chunk_list
+            unhandled_chunks = []
+
+            def direct_upload_chunk(chunk, chunk_number):
+                nonlocal unhandled_chunks
                 try:
-                    response = self.post_files(url=upload_url_response.upload_url, files=files)
-                    if response.ok:
-                        break
+                    response = self._upload_chunk(
+                        chunk_number=chunk_number,
+                        chunk=chunk,
+                        create_release_upload_response=create_release_upload_response,
+                    )
+                    if response is None:
+                        self.log.warn(f"Failed to get response for uploading chunk {chunk_number}")
+                        unhandled_chunks.append((chunk_number, 0, chunk))
                 except Exception as ex:
-                    if attempt < 2:
-                        self.log.warning(f"Failed to post in upload_binary: {ex}")
-                        self.log.warning("Will wait 10 seconds and try again")
-                        time.sleep(10)
-                    else:
-                        raise
+                    self.log.warn(
+                        f"Got an error response for uploading chunk {chunk_number} -> {ex}"
+                    )
+                    unhandled_chunks.append((chunk_number, 0, chunk))
+
+            while len(chunk_numbers) > 0:
+                chunk_number = chunk_numbers.pop(0)
+                chunk = binary_file.read(upload_metadata_response.chunk_size)
+                direct_upload_chunk(chunk, chunk_number)
+
+            while len(unhandled_chunks) > 0:
+                chunk_number, attempts, chunk = unhandled_chunks.pop(0)
+                if attempts >= 3:
+                    self.log.error(f"Failed to upload {len(unhandled_chunks)}")
+                    return False
+                direct_upload_chunk(chunk, chunk_number)
+
+        self._mark_upload_finished(create_release_upload_response=create_release_upload_response)
+
+        return True
 
     def commit_upload(
         self, *, owner_name: str, app_name: str, upload_id: str
-    ) -> ReleaseUploadEndResponse:
+    ) -> CommitUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
         :param str owner_name: The name of the app account owner
@@ -226,9 +385,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         """
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/release_uploads/{upload_id}"
+        request_url += f"/uploads/releases/{upload_id}"
 
-        data = {"status": "committed"}
+        data = {"upload_status": "uploadFinished"}
 
         for attempt in range(3):
             self.log.debug(f"Attempting patch {attempt}/3 in commit_upload")
@@ -244,7 +403,60 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                 else:
                     raise
 
-        return deserialize.deserialize(ReleaseUploadEndResponse, response.json())
+        return deserialize.deserialize(CommitUploadResponse, response.json())
+
+    def _wait_for_upload(
+        self, *, owner_name: str, app_name: str, upload_id: str
+    ) -> CommitUploadResponse:
+        """Wait for an upload to finish processing
+
+        :param str owner_name: The name of the app account owner
+        :param str app_name: The name of the app
+        :param str upload_id: The ID of the upload to wait for
+        """
+
+        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url += f"/uploads/releases/{upload_id}"
+
+        def wait():
+            self.log.info("Sleeping for 2 seconds before checking upload status again.")
+            time.sleep(2)  # Same as the app center CLI
+
+        while True:
+            self.log.info("Checking upload status...")
+            response = self.get(request_url)
+
+            if not response.ok:
+                wait()
+                continue
+
+            try:
+                response_data = deserialize.deserialize(CommitUploadResponse, response.json())
+            except Exception as ex:
+                self.log.warning(f"Failed to get response data: {ex}")
+                wait()
+                continue
+
+            if response_data.upload_status in ["uploadStarted", "uploadFinished"]:
+                wait()
+                continue
+
+            if response_data.upload_status == "uploadCanceled":
+                return response_data
+
+            if response_data.upload_status == "readyToBePublished":
+                return response_data
+
+            if response_data.upload_status == "malwareDetected":
+                raise Exception("Malware detected in uploaded binary")
+
+            if response_data.upload_status == "error":
+                raise Exception(
+                    "An error occurred when waiting for binary: "
+                    + response_data.get("error_details", "?")
+                )
+
+            raise Exception(f"Unexpected status: {response_data.upload_status}")
 
     def release(
         self,
@@ -362,18 +574,28 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         if not os.path.exists(binary_path):
             raise FileNotFoundError(f"Could not find binary: {binary_path}")
 
-        upload_begin_response = self.get_upload_url(
+        create_release_upload_response = self.get_upload_url(
             owner_name=owner_name, app_name=app_name, version=version, build_number=build_number
         )
 
-        self.upload_binary(upload_url_response=upload_begin_response, binary_path=binary_path)
-
-        upload_end_response = self.commit_upload(
-            owner_name=owner_name, app_name=app_name, upload_id=upload_begin_response.upload_id
+        success = self.upload_binary(
+            create_release_upload_response=create_release_upload_response, binary_path=binary_path
         )
 
-        if upload_end_response.release_id is None:
-            raise Exception(f"Failed to get release ID for upload")
+        if not success:
+            raise Exception("Failed to upload binary")
+
+        self.commit_upload(
+            owner_name=owner_name,
+            app_name=app_name,
+            upload_id=create_release_upload_response.identifier,
+        )
+
+        upload_end_response = self._wait_for_upload(
+            owner_name=owner_name,
+            app_name=app_name,
+            upload_id=create_release_upload_response.identifier,
+        )
 
         build_info = BuildInfo(
             branch_name=branch_name, commit_hash=commit_hash, commit_message=commit_message
@@ -383,11 +605,11 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         self.update_release(
             owner_name=owner_name,
             app_name=app_name,
-            release_id=upload_end_response.release_id,
+            release_id=upload_end_response.release_distinct_id,
             release_update_request=update_request,
         )
 
-        return upload_end_response.release_id
+        return upload_end_response.release_distinct_id
 
     def upload_and_release(
         self,

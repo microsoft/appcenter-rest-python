@@ -353,17 +353,49 @@ class ReleaseCounts:
     counts: List[ReleaseCount]
 
 
-class ReleaseUploadBeginResponse:
-    upload_id: str
-    upload_url: str
-    asset_id: Optional[str]
-    asset_domain: Optional[str]
-    asset_token: Optional[str]
+@deserialize.key("identifier", "id")
+class SetUploadMetadataResponse:
+    identifier: str
+    error: bool
+    chunk_size: int
+    resume_restart: bool
+    chunk_list: List[int]
+    blob_partitions: int
+    status_code: str
 
 
-class ReleaseUploadEndResponse:
-    release_id: Optional[str]
-    release_url: Optional[str]
+class ChunkUploadResponse:
+    error: bool
+    chunk_num: int
+    error_code: str
+
+
+@deserialize.key("identifier", "id")
+class CreateReleaseUploadResponse:
+    identifier: str
+    upload_domain: str
+    token: str
+    url_encoded_token: str
+    package_asset_id: str
+
+
+@deserialize.key("identifier", "id")
+class CommitUploadResponse:
+    identifier: str
+    upload_status: str
+    release_distinct_id: Optional[int]
+
+
+@deserialize.key("identifier", "id")
+class UploadCompleteResponse:
+    absolute_uri: str
+    chunk_num: int
+    error: bool
+    error_code: Optional[str]
+    location: str
+    message: str
+    raw_location: str
+    state: str
 
 
 @deserialize.key("identifier", "id")

@@ -223,6 +223,28 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
+    def post_raw_data(self, url: str, data: Any) -> requests.Response:
+        """Perform a POST request to a url
+
+        :param url: The URL to run the POST on
+        :param data: The JSON serializable data to send
+
+        :returns: The raw response
+
+        :raises AppCenterHTTPException: If the request fails with a non 200 status code
+        """
+        response = self.session.post(url, headers={}, data=data)
+
+        if response.status_code < 200 or response.status_code >= 300:
+            raise create_exception(response)
+
+        return response
+
+    @retry(
+        retry=(retry_if_exception(_is_connection_failure)),
+        wait=wait_fixed(10),
+        stop=stop_after_attempt(3),
+    )
     def post_files(self, url: str, *, files: Dict[str, Tuple[str, BinaryIO]]) -> requests.Response:
         """Perform a POST request to a url, sending files
 

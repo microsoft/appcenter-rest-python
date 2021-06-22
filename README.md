@@ -17,7 +17,7 @@ for group in client.crashes.get_error_groups(owner_name="owner", app_name="myapp
     print(group.errorGroupId)
     
 # 4. Get recent versions
-for version in client.versions.all(owner_name="owner", app_name="myapp):
+for version in client.versions.all(owner_name="owner", app_name="myapp"):
     print(version)
     
 # 5. Create a new release

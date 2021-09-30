@@ -556,3 +556,6 @@ class UserToken:
 
     # The creation date
     created_at: datetime.datetime
+
+    # The value of the token - Only set when creating a new tokern
+    api_token: Optional[str]

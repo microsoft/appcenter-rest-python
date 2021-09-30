@@ -170,19 +170,18 @@ class LibraryTests(unittest.TestCase):
     def test_upload(self):
         """Test upload."""
         client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
-        download_url = client.versions.upload_and_release(
+        release_id = client.versions.upload_build(
             owner_name=LibraryTests.OWNER_NAME,
             app_name="UploadTestApp",
             version="0.1",
             build_number="123",
             binary_path="/path/to/some.ipa",
-            group_id="3b2e51c1-5d07-4d04-8980-14d3b91e1a1c",
             release_notes="These are some release notes",
             branch_name="test_branch",
             commit_hash="1234567890123456789012345678901234567890",
             commit_message="This is a commit message",
         )
-        self.assertIsNotNone(download_url)
+        self.assertIsNotNone(release_id)
 
     def test_symbol_upload(self):
         """Test symbol."""

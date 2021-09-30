@@ -255,3 +255,19 @@ class LibraryTests(unittest.TestCase):
         self.assertLessEqual(len(managers), len(users))
 
         self.assertEqual(len(testers) + len(viewers) + len(developers) + len(managers), len(users))
+
+    def test_get_tokens(self):
+        """Test get tokens."""
+        client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
+        tokens = client.tokens.get_user_tokens()
+        assert len(tokens) > 0
+
+    def test_create_delete_tokens(self):
+        """Test creating and deleting tokens."""
+        client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
+        name = "appcenter test token"
+        new_token = client.tokens.create_user_token(
+            name, appcenter.AppCenterTokensClient.TokenScope.full
+        )
+        assert new_token.description == name
+        client.tokens.delete_user_token(new_token)

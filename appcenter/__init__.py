@@ -16,6 +16,7 @@ import requests
 from appcenter.account import AppCenterAccountClient
 from appcenter.analytics import AppCenterAnalyticsClient
 from appcenter.crashes import AppCenterCrashesClient
+from appcenter.tokens import AppCenterTokensClient
 from appcenter.versions import AppCenterVersionsClient
 
 
@@ -31,6 +32,7 @@ class AppCenterClient:
     account: AppCenterAccountClient
     analytics: AppCenterAnalyticsClient
     crashes: AppCenterCrashesClient
+    tokens: AppCenterTokensClient
     versions: AppCenterVersionsClient
 
     def __init__(
@@ -47,4 +49,5 @@ class AppCenterClient:
         self.account = AppCenterAccountClient(self.token, self.log)
         self.analytics = AppCenterAnalyticsClient(self.token, self.log)
         self.crashes = AppCenterCrashesClient(self.token, self.log)
+        self.tokens = AppCenterTokensClient(self.token, self.log)
         self.versions = AppCenterVersionsClient(self.token, self.log)

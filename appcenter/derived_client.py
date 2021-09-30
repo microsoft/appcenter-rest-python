@@ -133,6 +133,18 @@ class AppCenterDerivedClient:
         self.session = requests.Session()
         self.session.headers.update({"X-API-Token": self.token})
 
+    # pylint: disable=no-self-use
+    def base_url(self, *, version: str = "0.1") -> str:
+        """Generate the base URL for the API.
+
+        :param str version: The API version to hit
+
+        :returns: The base URL
+        """
+        return f"{API_BASE_URL}/v{version}"
+
+    # pylint: enable=no-self-use
+
     def generate_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
         """Generate a URL to use for querying the API.
 
@@ -143,7 +155,7 @@ class AppCenterDerivedClient:
         :returns: A generated URL base
         """
 
-        url = f"{API_BASE_URL}/v{version}/apps/{owner_name}/{app_name}"
+        url = self.base_url(version=version) + f"/apps/{owner_name}/{app_name}"
         self.log.debug(f"Generated URL: {url}")
         return url
 

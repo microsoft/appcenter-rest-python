@@ -539,3 +539,20 @@ class User:
 
     # The creation origin of this user
     origin: Origin
+
+
+@deserialize.key("identifier", "id")
+@deserialize.parser("created_at", iso8601parse)
+class UserToken:
+
+    # The unique ID of the token
+    identifier: str
+
+    # The user supplied description for the token
+    description: str
+
+    # The scope the token has
+    scope: List[str]
+
+    # The creation date
+    created_at: datetime.datetime

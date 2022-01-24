@@ -333,10 +333,10 @@ class ReleaseDetailsResponse:
 
 class ReleaseWithDistributionGroup:
 
-    release: str  # The release ID
+    release: int  # The release ID
     distribution_group: str  # The distribution group ID
 
-    def __init__(self, release: str, distribution_group: str) -> None:
+    def __init__(self, release: int, distribution_group: str) -> None:
         self.release = release
         self.distribution_group = distribution_group
 

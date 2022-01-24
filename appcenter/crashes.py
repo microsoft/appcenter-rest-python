@@ -379,7 +379,11 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         the total number of bytes to upload (if known).
 
         :raises Exception: If something goes wrong
+        :raises FileNotFoundError: If the symbols path doesn't have a file at the end
         """
+
+        if not os.path.isfile(symbols_path):
+            raise FileNotFoundError(f"There was no file at: {symbols_path}")
 
         if not symbols_name:
             symbols_name = os.path.basename(symbols_path)

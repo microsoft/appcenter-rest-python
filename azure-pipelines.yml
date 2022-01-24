@@ -31,16 +31,19 @@ jobs:
       $HOME/.poetry/bin/poetry install
     displayName: 'Install dependencies'
 
+  - script: 
+     source venv/bin/activate
+     python -m black --check -l 100 appcenter tests
+    displayName: 'Run Black'
+
   - script: |
       source bin/activate
-      python -m pylint --rcfile=pylintrc appcenter
-      python -m pylint --rcfile=pylintrc tests
+      python -m pylint --rcfile=pylintrc appcenter tests
     displayName: 'Lint'
 
   - script: |
       source bin/activate
-      python -m mypy --ignore-missing-imports appcenter/
-      python -m mypy --ignore-missing-imports tests/
+      python -m mypy --ignore-missing-imports appcenter/ tests/
     displayName: 'Type Check'
 
   - script: |

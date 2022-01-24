@@ -30,15 +30,15 @@ def iso8601parse(date_string: Optional[str]) -> Optional[datetime.datetime]:
 
 class HandledErrorReasonFrame:
     class ProgrammingLanguage(enum.Enum):
-        javascript = "JavaScript"
-        csharp = "CSharp"
-        objectivec = "Objective-C"
-        objectivecpp = "Objective-Cpp"
-        cpp = "Cpp"
-        c = "C"
-        swift = "Swift"
-        java = "Java"
-        unknown = "Unknown"
+        JAVASCRIPT = "JavaScript"
+        C_SHARP = "CSharp"
+        OBJECTIVE_C = "Objective-C"
+        OBJECTIVE_CPP = "Objective-Cpp"
+        CPP = "Cpp"
+        C = "C"
+        SWIFT = "Swift"
+        JAVA = "Java"
+        UNKNOWN = "Unknown"
 
     className: Optional[str]  # name of the class
     method: Optional[str]  # name of the method
@@ -56,9 +56,9 @@ class HandledErrorReasonFrame:
 
 
 class ErrorGroupState(enum.Enum):
-    open = "Open"
-    closed = "Closed"
-    ignored = "Ignored"
+    OPEN = "Open"
+    CLOSED = "Closed"
+    IGNORED = "Ignored"
 
 
 @deserialize.parser("firstOccurrence", iso8601parse)
@@ -157,8 +157,8 @@ class HandledErrorDetails:
 
 
 class ReleaseOrigin(enum.Enum):
-    hockey = "hockeyapp"
-    appcenter = "appcenter"
+    HOCKEY = "hockeyapp"
+    APP_CENTER = "appcenter"
 
 
 class BuildInfo:
@@ -192,16 +192,16 @@ class BuildInfo:
 
 
 class StoreType(enum.Enum):
-    intune = "intune"
-    googleplay = "googleplay"
-    apple = "apple"
-    none = "none"
+    INTUNE = "intune"
+    GOOGLE_PLAY = "googleplay"
+    APPLE = "apple"
+    NONE = "none"
 
 
 class DestinationType(enum.Enum):
-    group = "group"
-    store = "store"
-    tester = "tester"
+    GROUP = "group"
+    STORE = "store"
+    TESTER = "tester"
 
 
 @deserialize.key("identifier", "id")
@@ -231,9 +231,9 @@ class BasicReleaseDetailsResponse:
 
 
 class ProvisioningProfileType(enum.Enum):
-    adhoc = "adhoc"
-    enterprise = "enterprise"
-    other = "other"
+    ADHOC = "adhoc"
+    ENTERPRISE = "enterprise"
+    OTHER = "other"
 
 
 @deserialize.key("identifier", "id")
@@ -471,11 +471,11 @@ class ReleaseUpdateRequest:
 
 
 class SymbolType(enum.Enum):
-    apple = "Apple"
-    javascript = "JavaScript"
-    breakpad = "Breakpad"
-    proguard = "AndroidProguard"
-    uwp = "UWP"
+    APPLE = "Apple"
+    JAVASCRIPT = "JavaScript"
+    BREAKPAD = "Breakpad"
+    PROGUARD = "AndroidProguard"
+    UWP = "UWP"
 
 
 @deserialize.parser("expiration_date", iso8601parse)
@@ -486,8 +486,8 @@ class SymbolUploadBeginResponse:
 
 
 class SymbolUploadStatus(enum.Enum):
-    committed = "committed"
-    aborted = "aborted"
+    COMMITTED = "committed"
+    ABORTED = "aborted"
 
 
 class SymbolUploadEndRequest:
@@ -495,22 +495,22 @@ class SymbolUploadEndRequest:
 
 
 class Origin(enum.Enum):
-    appcenter = "appcenter"
-    hockeyapp = "hockeyapp"
-    codepush = "codepush"
+    APP_CENTER = "appcenter"
+    HOCKEY = "hockeyapp"
+    CODEPUSH = "codepush"
 
 
 class Permission(enum.Enum):
-    manager = "manager"
-    developer = "developer"
-    viewer = "viewer"
-    tester = "tester"
+    MANAGER = "manager"
+    DEVELOPER = "developer"
+    VIEWER = "viewer"
+    TESTER = "tester"
 
 
 class Role(enum.Enum):
-    admin = "admin"
-    collaborator = "collaborator"
-    member = "member"
+    ADMIN = "admin"
+    COLLABORATOR = "collaborator"
+    MEMBER = "member"
 
 
 @deserialize.key("identifier", "id")

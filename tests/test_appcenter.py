@@ -192,7 +192,7 @@ class LibraryTests(unittest.TestCase):
             version="0.1",
             build_number="123",
             symbols_path="/path/to/some.dSYM.zip",
-            symbol_type=appcenter.models.SymbolType.apple,
+            symbol_type=appcenter.models.SymbolType.APPLE,
         )
 
     def test_annotations(self):
@@ -237,16 +237,16 @@ class LibraryTests(unittest.TestCase):
         self.assertTrue(len(users) > 0)
 
         testers = list(
-            filter(lambda user: user.permissions[0] == appcenter.models.Permission.tester, users)
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.TESTER, users)
         )
         viewers = list(
-            filter(lambda user: user.permissions[0] == appcenter.models.Permission.viewer, users)
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.VIEWER, users)
         )
         developers = list(
-            filter(lambda user: user.permissions[0] == appcenter.models.Permission.developer, users)
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.DEVELOPER, users)
         )
         managers = list(
-            filter(lambda user: user.permissions[0] == appcenter.models.Permission.manager, users)
+            filter(lambda user: user.permissions[0] == appcenter.models.Permission.MANAGER, users)
         )
 
         self.assertLessEqual(len(testers), len(users))
@@ -267,7 +267,7 @@ class LibraryTests(unittest.TestCase):
         client = appcenter.AppCenterClient(access_token=LibraryTests.TOKEN)
         name = "appcenter test token"
         new_token = client.tokens.create_user_token(
-            name, appcenter.AppCenterTokensClient.TokenScope.full
+            name, appcenter.AppCenterTokensClient.TokenScope.FULL
         )
         assert new_token.description == name
         client.tokens.delete_user_token(new_token)

@@ -308,7 +308,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: SymbolUploadBeginResponse
         """
 
-        if symbol_type == SymbolType.proguard:
+        if symbol_type == SymbolType.PROGUARD:
             if build_number is None:
                 raise ValueError("The build number is required for Android")
 
@@ -410,7 +410,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             upload_id=begin_upload_response.symbol_upload_id,
         )
 
-        if commit_response.status != SymbolUploadStatus.committed:
+        if commit_response.status != SymbolUploadStatus.COMMITTED:
             raise Exception("Failed to upload symbols")
 
     def _next_link_polished(self, next_link: str, owner_name: str, app_name: str) -> str:

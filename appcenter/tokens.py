@@ -21,9 +21,10 @@ class AppCenterTokensClient(AppCenterDerivedClient):
     """
 
     class TokenScope(enum.Enum):
+        """Specifies the scope of a token."""
 
-        full = "all"
-        reader = "viewer"
+        FULL = "all"
+        READER = "viewer"
 
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("tokens", token, parent_logger)

@@ -54,7 +54,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
         request_url = self.base_url()
         request_url += "/api_tokens"
 
-        self.log.debug(f"Creating user token {name=}, {scope=}")
+        self.log.debug(f"Creating user token name={name}, scope={scope}")
 
         response = self.post(request_url, data={"description": name, "scope": [scope.value]})
 

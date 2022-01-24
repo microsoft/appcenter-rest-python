@@ -111,13 +111,13 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return deserialize.deserialize(List[BasicReleaseDetailsResponse], response.json())
 
     def release_details(
-        self, *, owner_name: str, app_name: str, release_id: str
+        self, *, owner_name: str, app_name: str, release_id: int
     ) -> ReleaseDetailsResponse:
         """Get the full release details for a given version.
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param str release_id: The ID of the release to get the details for
+        :param int release_id: The ID of the release to get the details for
 
         :returns: The full details for a release
         """
@@ -163,7 +163,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for version in self.all(owner_name=owner_name, app_name=app_name):
 
             full_details = self.release_details(
-                owner_name=owner_name, app_name=app_name, release_id=str(version.identifier)
+                owner_name=owner_name, app_name=app_name, release_id=version.identifier
             )
 
             if full_details.build is None:
@@ -467,7 +467,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         *,
         owner_name: str,
         app_name: str,
-        release_id: str,
+        release_id: int,
         group_id: str,
         mandatory_update: bool = False,
         notify_testers: bool = False,
@@ -476,7 +476,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param str release_id: The release ID of the app
+        :param int release_id: The release ID of the app
         :param str group_id: The release ID of the group to release to
         :param bool mandatory_update: Set to True to make this a mandatory update
         :param bool notify_testers: Set to True to notify testers about this new build
@@ -514,14 +514,14 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         *,
         owner_name: str,
         app_name: str,
-        release_id: str,
+        release_id: int,
         release_update_request: ReleaseUpdateRequest,
     ) -> None:
         """Update a release with new details
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param str release_id: The release ID of the app
+        :param int release_id: The release ID of the app
         :param ReleaseUpdateRequest release_update_request: The release ID of the group to release to
 
         :returns: The App Center release identifier
@@ -554,7 +554,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         branch_name: Optional[str] = None,
         commit_hash: Optional[str] = None,
         commit_message: Optional[str] = None,
-    ) -> Optional[str]:
+    ) -> Optional[int]:
         """Get the App Center release identifier for the app version (usually build number).
 
         :param str owner_name: The name of the app account owner
@@ -568,7 +568,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :raises FileNotFoundError: If the supplied binary is not found
         :raises Exception: If we don't get a release ID back after upload
 
-        :returns: The release details
+        :returns: The release ID
         """
 
         if not os.path.exists(binary_path):
@@ -596,6 +596,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             app_name=app_name,
             upload_id=create_release_upload_response.identifier,
         )
+
+        if upload_end_response.release_distinct_id is None:
+            raise Exception("No release ID was supplied in the upload end response")
 
         build_info = BuildInfo(
             branch_name=branch_name, commit_hash=commit_hash, commit_message=commit_message

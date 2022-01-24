@@ -543,8 +543,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         *,
         owner_name: str,
         app_name: str,
-        version: str,
-        build_number: str,
         binary_path: str,
         release_notes: str,
         branch_name: Optional[str] = None,
@@ -555,8 +553,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param str version: The app version
-        :param str build_number: The build number
         :param str binary_path: The path to the binary to upload
         :param str release_notes: The release notes for the release
         :param Optional[str] branch_name: The git branch that the build came from
@@ -614,8 +610,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         *,
         owner_name: str,
         app_name: str,
-        version: str,
-        build_number: str,
         binary_path: str,
         group_id: str,
         release_notes: str,
@@ -628,8 +622,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param str version: The app version
-        :param str build_number: The build number
         :param str binary_path: The path to the binary to upload
         :param str group_id: The ID of the group to release to
         :param str release_notes: The release notes for the release
@@ -647,8 +639,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         release_id = self.upload_build(
             owner_name=owner_name,
             app_name=app_name,
-            version=version,
-            build_number=build_number,
             binary_path=binary_path,
             release_notes=release_notes,
             branch_name=branch_name,

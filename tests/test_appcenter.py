@@ -173,8 +173,6 @@ class LibraryTests(unittest.TestCase):
         release_id = client.versions.upload_build(
             owner_name=LibraryTests.OWNER_NAME,
             app_name="UploadTestApp",
-            version="0.1",
-            build_number="123",
             binary_path="/path/to/some.ipa",
             release_notes="These are some release notes",
             branch_name="test_branch",

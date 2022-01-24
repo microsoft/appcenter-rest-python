@@ -663,7 +663,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             app_name=app_name,
             release_id=release_id,
             group_id=group_id,
-            notify_testers=notify_testers,
+            notify_testers=notify_testers if notify_testers else False,
         )
 
         return self.release_details(owner_name=owner_name, app_name=app_name, release_id=release_id)

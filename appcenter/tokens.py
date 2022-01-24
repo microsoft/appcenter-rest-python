@@ -70,10 +70,10 @@ class AppCenterTokensClient(AppCenterDerivedClient):
         request_url += "/api_tokens/"
 
         if isinstance(token, str):
-            self.log.debug(f"Deleting user token {token=}")
+            self.log.debug(f"Deleting user token={token}")
             request_url += token
         else:
-            self.log.debug(f"Deleting user token {token.identifier=}")
+            self.log.debug(f"Deleting user token={token.identifier}")
             request_url += token.identifier
 
         _ = self.delete(request_url)

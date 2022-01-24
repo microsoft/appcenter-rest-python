@@ -305,7 +305,7 @@ class ReleaseDetailsResponse:
     download_url: Optional[str]
 
     # A URL to the app's icon.
-    app_icon_url: str
+    app_icon_url: Optional[str]
 
     # The href required to install a release on a mobile device. On iOS devices will be prefixed
     # with itms-services://?action=download-manifest&url=

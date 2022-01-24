@@ -35,7 +35,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         self.log.info(f"Getting user for: {owner_name}/{app_name}")
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/users"
+        request_url += "/users"
 
         response = self.get(request_url)
 
@@ -60,7 +60,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         self.log.info(f"Adding user {user_email} as collaborator on: {owner_name}/{app_name}")
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/invitations"
+        request_url += "/invitations"
 
         data = {"user_email": user_email}
 

@@ -68,7 +68,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         self.log.info(f"Getting recent versions of app: {owner_name}/{app_name}")
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/recent_releases"
+        request_url += "/recent_releases"
 
         response = self.get(request_url)
 
@@ -97,7 +97,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         self.log.info(f"Getting versions of app: {owner_name}/{app_name}")
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/releases?"
+        request_url += "/releases?"
 
         parameters = {"published_only": str(published_only).lower()}
 
@@ -184,7 +184,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         """
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/uploads/releases"
+        request_url += "/uploads/releases"
 
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in get_upload_url")

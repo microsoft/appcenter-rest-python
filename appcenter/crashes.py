@@ -170,7 +170,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         # pylint: disable=too-many-locals
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/errors/errorGroups?"
+        request_url += "/errors/errorGroups?"
 
         parameters = {"start": start_time.replace(microsecond=0).isoformat()}
 
@@ -316,7 +316,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
                 raise ValueError("The version is required for Android")
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/symbol_uploads"
+        request_url += "/symbol_uploads"
 
         data = {"symbol_type": symbol_type.value, "file_name": symbols_name}
 

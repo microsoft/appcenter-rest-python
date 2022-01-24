@@ -38,7 +38,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
         self.log.info("Getting user tokens")
 
         request_url = self.base_url()
-        request_url += f"/api_tokens"
+        request_url += "/api_tokens"
 
         response = self.get(request_url)
 
@@ -52,7 +52,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
         """
 
         request_url = self.base_url()
-        request_url += f"/api_tokens"
+        request_url += "/api_tokens"
 
         self.log.debug(f"Creating user token {name=}, {scope=}")
 
@@ -67,7 +67,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
         """
 
         request_url = self.base_url()
-        request_url += f"/api_tokens/"
+        request_url += "/api_tokens/"
 
         if isinstance(token, str):
             self.log.debug(f"Deleting user token {token=}")

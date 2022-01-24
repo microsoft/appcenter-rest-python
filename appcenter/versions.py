@@ -287,10 +287,12 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
     def _mark_upload_finished(
         self, *, create_release_upload_response: CreateReleaseUploadResponse
-    ) -> UploadCompleteResponse:
+    ) -> Optional[UploadCompleteResponse]:
         """Mark the upload of a binary as finished
 
         :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+
+        :returns: The upload complete response on success, None otherwise.
         """
 
         request_url = create_release_upload_response.upload_domain
@@ -331,6 +333,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         upload_metadata_response = self.set_upload_metadata(
             create_release_upload_response=create_release_upload_response, binary_path=binary_path
         )
+
+        if not upload_metadata_response:
+            self.log.error("Failed to get upload metadata response")
+            return False
 
         with open(binary_path, "rb") as binary_file:
 

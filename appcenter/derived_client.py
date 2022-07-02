@@ -100,7 +100,7 @@ def create_exception(response: requests.Response) -> AppCenterHTTPException:
         return AppCenterHTTPException(response)
 
 
-def _is_connection_failure(exception: Exception) -> bool:
+def _is_connection_failure(exception: BaseException) -> bool:
     exception_checks = [
         "Operation timed out",
         "Connection aborted.",

@@ -6,7 +6,7 @@
 import logging
 import os
 import time
-from typing import Iterator, List, Optional
+from typing import List, Optional
 import urllib.parse
 
 import deserialize
@@ -81,7 +81,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         app_name: str,
         published_only: bool = False,
         scope: Optional[str] = None,
-    ) -> Iterator[BasicReleaseDetailsResponse]:
+    ) -> List[BasicReleaseDetailsResponse]:
         """Get all (the 100 latest) versions.
 
         :param str owner_name: The name of the app account owner

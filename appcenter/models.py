@@ -161,6 +161,7 @@ class ReleaseOrigin(enum.Enum):
     APP_CENTER = "appcenter"
 
 
+@deserialize.auto_snake()
 class BuildInfo:
     branch_name: Optional[str]
     commit_hash: Optional[str]

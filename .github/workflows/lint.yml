@@ -33,12 +33,12 @@ jobs:
 
     - name: Run Black
       run: |
-        poetry run black --check $(git ls-files '*.py')
+        poetry run black --check appcenter tests
 
     - name: Lint
       run: |
-        poetry run pylint $(git ls-files '*.py')
+        poetry run pylint appcenter tests
 
     - name: Type check
       run: |
-        poetry run mypy $(git ls-files '*.py')
+        poetry run mypy appcenter tests

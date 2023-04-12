@@ -336,8 +336,8 @@ def test_users(owner_name: str, app_name: str, token: str):
     assert len(testers) + len(viewers) + len(developers) + len(managers) == len(users)
 
 
-def test_get_tokens(token: str):
-    """Test get tokens."""
+def test_get_user_tokens(token: str):
+    """Test get user tokens."""
     client = appcenter.AppCenterClient(access_token=token)
     tokens = client.tokens.get_user_tokens()
     assert len(tokens) > 0

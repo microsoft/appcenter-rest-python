@@ -28,18 +28,18 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7.2"
 azure-storage-blob = "^2.1.0"
-deserialize = "^1.8.0"
-requests = "^2.22.0"
-tenacity = "^8.0.1"
-types-requests = "=2.27.7"
+deserialize = "^2.0.1"
+requests = "^2.28.2"
+tenacity = "^8.2.2"
+types-requests = "^2.28.11.17"
 
 [tool.poetry.dev-dependencies]
-black = "=22.6.0"
-mypy = "=0.961"
-pylint = "=2.14.4"
-pytest = "=7.1.2"
-pytest-cov = "=3.0.0"
+black = "^23.3.0"
+mypy = "^1.2.0"
+pylint = "^2.17.2"
+pytest = "^7.3.0"
+pytest-cov = "^4.0.0"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

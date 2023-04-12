@@ -39,7 +39,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("crashes", token, parent_logger)
 
-    def group_details(self, *, owner_name: str, app_name: str, error_group_id: str) -> ErrorGroup:
+    def group_details(
+        self, *, owner_name: str, app_name: str, error_group_id: str
+    ) -> ErrorGroup:
         """Get the error group details.
 
         :param str owner_name: The name of the app account owner
@@ -93,7 +95,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         """
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
+        request_url += (
+            f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
+        )
 
         response = self.get(request_url)
 
@@ -200,7 +204,6 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         page = 0
 
         while True:
-
             page += 1
 
             self.log.info(f"Fetching page {page} of crash groups")
@@ -266,7 +269,6 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         page = 0
 
         while True:
-
             page += 1
 
             self.log.info(f"Fetching page {page} of crashes for group {error_group_id}")
@@ -401,7 +403,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             url_components = urllib.parse.urlparse(begin_upload_response.upload_url)
             path = url_components.path[1:]
             container, blob_name = path.split("/")
-            connection_string = f"BlobEndpoint={url_components.scheme}://{url_components.netloc};"
+            connection_string = (
+                f"BlobEndpoint={url_components.scheme}://{url_components.netloc};"
+            )
             connection_string += f"SharedAccessSignature={url_components.query}"
             service = BlockBlobService(connection_string=connection_string)
             service.create_blob_from_stream(
@@ -417,7 +421,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         if commit_response.status != SymbolUploadStatus.COMMITTED:
             raise Exception("Failed to upload symbols")
 
-    def _next_link_polished(self, next_link: str, owner_name: str, app_name: str) -> str:
+    def _next_link_polished(
+        self, next_link: str, owner_name: str, app_name: str
+    ) -> str:
         """Polish nextLink string gotten from AppCenter service
 
         :param str next_link: The nextLink property from a service response when items are queried in batches

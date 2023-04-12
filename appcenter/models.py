@@ -64,7 +64,6 @@ class ErrorGroupState(enum.Enum):
 @deserialize.parser("firstOccurrence", iso8601parse)
 @deserialize.parser("lastOccurrence", iso8601parse)
 class ErrorGroupListItem:
-
     state: ErrorGroupState
     annotation: Optional[str]
     errorGroupId: str
@@ -87,7 +86,6 @@ class ErrorGroupListItem:
 
 
 class ErrorGroups:
-
     nextLink: Optional[str]
     errorGroups: Optional[List[ErrorGroupListItem]]
 
@@ -95,7 +93,6 @@ class ErrorGroups:
 @deserialize.parser("firstOccurrence", iso8601parse)
 @deserialize.parser("lastOccurrence", iso8601parse)
 class ErrorGroup:
-
     state: ErrorGroupState
     annotation: Optional[str]
     errorGroupId: str
@@ -119,7 +116,6 @@ class ErrorGroup:
 
 @deserialize.parser("timestamp", iso8601parse)
 class HandledError:
-
     errorId: Optional[str]
     timestamp: Optional[datetime.datetime]
     deviceName: Optional[str]
@@ -131,7 +127,6 @@ class HandledError:
 
 
 class HandledErrors:
-
     nextLink: Optional[str]
     errors: Optional[List[HandledError]]
 
@@ -139,7 +134,6 @@ class HandledErrors:
 @deserialize.parser("timestamp", iso8601parse)
 @deserialize.parser("appLaunchTimestamp", iso8601parse)
 class HandledErrorDetails:
-
     errorId: Optional[str]
     timestamp: Optional[datetime.datetime]
     deviceName: Optional[str]
@@ -220,7 +214,6 @@ class Destination:
 @deserialize.key("identifier", "id")
 @deserialize.parser("uploaded_at", iso8601parse)
 class BasicReleaseDetailsResponse:
-
     identifier: int
     version: str
     origin: Optional[ReleaseOrigin]
@@ -241,7 +234,6 @@ class ProvisioningProfileType(enum.Enum):
 @deserialize.parser("provisioning_profile_expiry_date", iso8601parse)
 @deserialize.parser("uploaded_at", iso8601parse)
 class ReleaseDetailsResponse:
-
     # ID identifying this unique release.
     identifier: int
 
@@ -333,7 +325,6 @@ class ReleaseDetailsResponse:
 
 
 class ReleaseWithDistributionGroup:
-
     release: int  # The release ID
     distribution_group: str  # The distribution group ID
 
@@ -411,7 +402,9 @@ class DestinationId:
     name: Optional[str]
     identifier: Optional[str]
 
-    def __init__(self, *, name: Optional[str] = None, identifier: Optional[str] = None) -> None:
+    def __init__(
+        self, *, name: Optional[str] = None, identifier: Optional[str] = None
+    ) -> None:
         self.name = name
         self.identifier = identifier
 
@@ -428,7 +421,6 @@ class DestinationId:
 
 
 class ReleaseUpdateRequest:
-
     release_notes: Optional[str]
     mandatory_update: Optional[bool]
     destinations: Optional[List[DestinationId]]
@@ -460,7 +452,9 @@ class ReleaseUpdateRequest:
             output["mandatory_update"] = self.mandatory_update
 
         if self.destinations is not None:
-            output["destinations"] = [destination.json() for destination in self.destinations]
+            output["destinations"] = [
+                destination.json() for destination in self.destinations
+            ]
 
         if self.build is not None:
             output["build"] = self.build.json()
@@ -516,7 +510,6 @@ class Role(enum.Enum):
 
 @deserialize.key("identifier", "id")
 class User:
-
     # The unique ID of the user
     identifier: str
 
@@ -545,7 +538,6 @@ class User:
 @deserialize.key("identifier", "id")
 @deserialize.parser("created_at", iso8601parse)
 class UserToken:
-
     # The unique ID of the token
     identifier: str
 

@@ -23,7 +23,11 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
         super().__init__("analytics", token, parent_logger)
 
     def release_counts(
-        self, *, owner_name: str, app_name: str, releases: List[ReleaseWithDistributionGroup]
+        self,
+        *,
+        owner_name: str,
+        app_name: str,
+        releases: List[ReleaseWithDistributionGroup],
     ) -> ReleaseCounts:
         """Get the release counts for an app
 
@@ -42,7 +46,10 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
         data = []
         for release in releases:
             data.append(
-                {"release": release.release, "distribution_group": release.distribution_group}
+                {
+                    "release": release.release,
+                    "distribution_group": release.distribution_group,
+                }
             )
 
         response = self.post(request_url, data={"releases": data})

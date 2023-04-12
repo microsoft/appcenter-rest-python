@@ -42,7 +42,8 @@ pytest-cov = "^4.0.0"
 
 [[tool.mypy.overrides]]
 module = [
-    "deserialize"
+    "deserialize",
+    "azure.storage.blob"
 ]
 ignore_missing_imports = true
 

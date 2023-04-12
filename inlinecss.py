@@ -10,7 +10,7 @@ def inline(folder):
     """Inline the CSS for all HTML files in the folder."""
 
     with open(os.path.join(folder, "style.css"), encoding="utf-8") as style_file:
-        style = f'<style>\n{style_file.read()}\n</style>'
+        style = f"<style>\n{style_file.read()}\n</style>"
 
     for dirpath, _, filenames in os.walk(folder):
         for filename in filenames:
@@ -22,9 +22,11 @@ def inline(folder):
             with open(file_path, encoding="utf-8") as html_file:
                 contents = html_file.read()
 
-            contents = contents.replace('<link rel="stylesheet" href="style.css" type="text/css">', style)
+            contents = contents.replace(
+                '<link rel="stylesheet" href="style.css" type="text/css">', style
+            )
 
-            with open(file_path, 'w', encoding="utf-8") as html_file:
+            with open(file_path, "w", encoding="utf-8") as html_file:
                 html_file.write(contents)
 
 

@@ -44,7 +44,9 @@ def get_from_keychain() -> Optional[str]:
         return None
 
     # The output is somewhat complex. We are looking for the line starting "password:"
-    password_lines = [line for line in output.split("\n") if line.startswith("password: ")]
+    password_lines = [
+        line for line in output.split("\n") if line.startswith("password: ")
+    ]
 
     if len(password_lines) != 1:
         raise Exception("Failed to get password from security output")
@@ -210,7 +212,9 @@ def test_release_details(owner_name: str, app_name: str, token: str):
 def test_latest_commit(owner_name: str, app_name: str, token: str):
     """Test release details."""
     client = appcenter.AppCenterClient(access_token=token)
-    commit_hash = client.versions.latest_commit(owner_name=owner_name, app_name=app_name)
+    commit_hash = client.versions.latest_commit(
+        owner_name=owner_name, app_name=app_name
+    )
     assert commit_hash is not None
 
 
@@ -316,16 +320,28 @@ def test_users(owner_name: str, app_name: str, token: str):
     assert len(users) > 0
 
     testers = list(
-        filter(lambda user: user.permissions[0] == appcenter.models.Permission.TESTER, users)
+        filter(
+            lambda user: user.permissions[0] == appcenter.models.Permission.TESTER,
+            users,
+        )
     )
     viewers = list(
-        filter(lambda user: user.permissions[0] == appcenter.models.Permission.VIEWER, users)
+        filter(
+            lambda user: user.permissions[0] == appcenter.models.Permission.VIEWER,
+            users,
+        )
     )
     developers = list(
-        filter(lambda user: user.permissions[0] == appcenter.models.Permission.DEVELOPER, users)
+        filter(
+            lambda user: user.permissions[0] == appcenter.models.Permission.DEVELOPER,
+            users,
+        )
     )
     managers = list(
-        filter(lambda user: user.permissions[0] == appcenter.models.Permission.MANAGER, users)
+        filter(
+            lambda user: user.permissions[0] == appcenter.models.Permission.MANAGER,
+            users,
+        )
     )
 
     assert len(testers) <= len(users)

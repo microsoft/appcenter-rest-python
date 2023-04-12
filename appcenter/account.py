@@ -42,7 +42,12 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         return deserialize.deserialize(List[User], response.json())
 
     def add_collaborator(
-        self, *, owner_name: str, app_name: str, user_email: str, role: Optional[Role] = None
+        self,
+        *,
+        owner_name: str,
+        app_name: str,
+        user_email: str,
+        role: Optional[Role] = None,
     ) -> None:
         """Add a user as a collaborator to an app.
 
@@ -57,7 +62,9 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         :returns: The list of users
         """
 
-        self.log.info(f"Adding user {user_email} as collaborator on: {owner_name}/{app_name}")
+        self.log.info(
+            f"Adding user {user_email} as collaborator on: {owner_name}/{app_name}"
+        )
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += "/invitations"
@@ -69,7 +76,9 @@ class AppCenterAccountClient(AppCenterDerivedClient):
 
         self.post(request_url, data=data)
 
-    def delete_collaborator(self, *, owner_name: str, app_name: str, user_email: str) -> None:
+    def delete_collaborator(
+        self, *, owner_name: str, app_name: str, user_email: str
+    ) -> None:
         """Remove a user as a collaborator from an app.
 
         :param str owner_name: The name of the app account owner

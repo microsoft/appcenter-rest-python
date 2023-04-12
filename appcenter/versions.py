@@ -56,7 +56,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("versions", token, parent_logger)
 
-    def recent(self, *, owner_name: str, app_name: str) -> List[BasicReleaseDetailsResponse]:
+    def recent(
+        self, *, owner_name: str, app_name: str
+    ) -> List[BasicReleaseDetailsResponse]:
         """Get the recent version for each distribution group.
 
         :param str owner_name: The name of the app account owner
@@ -72,7 +74,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         response = self.get(request_url)
 
-        return deserialize.deserialize(List[BasicReleaseDetailsResponse], response.json())
+        return deserialize.deserialize(
+            List[BasicReleaseDetailsResponse], response.json()
+        )
 
     def all(
         self,
@@ -108,7 +112,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         response = self.get(request_url)
 
-        return deserialize.deserialize(List[BasicReleaseDetailsResponse], response.json())
+        return deserialize.deserialize(
+            List[BasicReleaseDetailsResponse], response.json()
+        )
 
     def release_details(
         self, *, owner_name: str, app_name: str, release_id: int
@@ -161,7 +167,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         self.log.info(f"Getting latest commit for app: {owner_name}/{app_name}")
 
         for version in self.all(owner_name=owner_name, app_name=app_name):
-
             full_details = self.release_details(
                 owner_name=owner_name, app_name=app_name, release_id=version.identifier
             )
@@ -174,7 +179,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         return None
 
-    def get_upload_url(self, *, owner_name: str, app_name: str) -> CreateReleaseUploadResponse:
+    def get_upload_url(
+        self, *, owner_name: str, app_name: str
+    ) -> CreateReleaseUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
         :param str owner_name: The name of the app account owner
@@ -203,7 +210,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return deserialize.deserialize(CreateReleaseUploadResponse, response.json())
 
     def set_upload_metadata(
-        self, *, create_release_upload_response: CreateReleaseUploadResponse, binary_path: str
+        self,
+        *,
+        create_release_upload_response: CreateReleaseUploadResponse,
+        binary_path: str,
     ) -> Optional[SetUploadMetadataResponse]:
         """Set the metadata for a binary upload
 
@@ -220,7 +230,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         mime_type = MIME_TYPES.get(file_ext)
 
         request_url = create_release_upload_response.upload_domain
-        request_url += f"/upload/set_metadata/{create_release_upload_response.package_asset_id}?"
+        request_url += (
+            f"/upload/set_metadata/{create_release_upload_response.package_asset_id}?"
+        )
 
         parameters = {"file_name": file_name, "file_size": file_size}
 
@@ -235,7 +247,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             try:
                 response = self.post(request_url, data={})
                 if response.ok:
-                    return deserialize.deserialize(SetUploadMetadataResponse, response.json())
+                    return deserialize.deserialize(
+                        SetUploadMetadataResponse, response.json()
+                    )
             except Exception as ex:
                 if attempt < 2:
                     self.log.warning(f"Failed to post in set_upload_metadata: {ex}")
@@ -262,7 +276,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         """
 
         request_url = create_release_upload_response.upload_domain
-        request_url += f"/upload/upload_chunk/{create_release_upload_response.package_asset_id}?"
+        request_url += (
+            f"/upload/upload_chunk/{create_release_upload_response.package_asset_id}?"
+        )
 
         parameters = {"block_number": chunk_number}
 
@@ -296,7 +312,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         """
 
         request_url = create_release_upload_response.upload_domain
-        request_url += f"/upload/finished/{create_release_upload_response.package_asset_id}?"
+        request_url += (
+            f"/upload/finished/{create_release_upload_response.package_asset_id}?"
+        )
 
         parameters = {"callback": ""}
 
@@ -308,7 +326,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             try:
                 response = self.post_raw_data(request_url, data=None)
                 if response.ok:
-                    return deserialize.deserialize(UploadCompleteResponse, response.json())
+                    return deserialize.deserialize(
+                        UploadCompleteResponse, response.json()
+                    )
             except Exception as ex:
                 if attempt < 2:
                     self.log.warning(f"Failed to post in _mark_upload_finished: {ex}")
@@ -320,7 +340,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return None
 
     def upload_binary(
-        self, *, create_release_upload_response: CreateReleaseUploadResponse, binary_path: str
+        self,
+        *,
+        create_release_upload_response: CreateReleaseUploadResponse,
+        binary_path: str,
     ) -> bool:
         """Upload a binary
 
@@ -331,7 +354,8 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         """
 
         upload_metadata_response = self.set_upload_metadata(
-            create_release_upload_response=create_release_upload_response, binary_path=binary_path
+            create_release_upload_response=create_release_upload_response,
+            binary_path=binary_path,
         )
 
         if not upload_metadata_response:
@@ -339,7 +363,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             return False
 
         with open(binary_path, "rb") as binary_file:
-
             chunk_numbers = upload_metadata_response.chunk_list
             unhandled_chunks = []
 
@@ -352,7 +375,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                         create_release_upload_response=create_release_upload_response,
                     )
                     if response is None:
-                        self.log.warn(f"Failed to get response for uploading chunk {chunk_number}")
+                        self.log.warn(
+                            f"Failed to get response for uploading chunk {chunk_number}"
+                        )
                         unhandled_chunks.append((chunk_number, 0, chunk))
                 except Exception as ex:
                     self.log.warn(
@@ -372,7 +397,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                     return False
                 direct_upload_chunk(chunk, chunk_number)
 
-        self._mark_upload_finished(create_release_upload_response=create_release_upload_response)
+        self._mark_upload_finished(
+            create_release_upload_response=create_release_upload_response
+        )
 
         return True
 
@@ -435,7 +462,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                 continue
 
             try:
-                response_data = deserialize.deserialize(CommitUploadResponse, response.json())
+                response_data = deserialize.deserialize(
+                    CommitUploadResponse, response.json()
+                )
             except Exception as ex:
                 self.log.warning(f"Failed to get response data: {ex}")
                 wait()
@@ -579,7 +608,8 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         )
 
         success = self.upload_binary(
-            create_release_upload_response=create_release_upload_response, binary_path=binary_path
+            create_release_upload_response=create_release_upload_response,
+            binary_path=binary_path,
         )
 
         if not success:
@@ -601,9 +631,13 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             raise Exception("No release ID was supplied in the upload end response")
 
         build_info = BuildInfo(
-            branch_name=branch_name, commit_hash=commit_hash, commit_message=commit_message
+            branch_name=branch_name,
+            commit_hash=commit_hash,
+            commit_message=commit_message,
         )
-        update_request = ReleaseUpdateRequest(release_notes=release_notes, build=build_info)
+        update_request = ReleaseUpdateRequest(
+            release_notes=release_notes, build=build_info
+        )
 
         self.update_release(
             owner_name=owner_name,
@@ -666,4 +700,6 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             notify_testers=notify_testers if notify_testers else False,
         )
 
-        return self.release_details(owner_name=owner_name, app_name=app_name, release_id=release_id)
+        return self.release_details(
+            owner_name=owner_name, app_name=app_name, release_id=release_id
+        )

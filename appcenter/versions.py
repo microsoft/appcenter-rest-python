@@ -181,13 +181,19 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return None
 
     def get_upload_url(
-        self, *, owner_name: str, app_name: str, build_version: str
+        self,
+        *,
+        owner_name: str,
+        app_name: str,
+        binary_path: str,
+        build_version: Optional[str] = None,
     ) -> CreateReleaseUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param srt build_version: The user defined build version of the app
+        :param str file_ext: The file extension of the artifact being uploaded
+        :param Optional[str] build_version: The user defined build version of the app. Required for Windows zip artifacts
 
         :returns: The App Center release identifier
         """
@@ -195,10 +201,23 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += "/uploads/releases"
 
+        file_name = os.path.basename(binary_path)
+        file_ext = os.path.splitext(file_name)[-1]
+        if file_ext.startswith("."):
+            file_ext = file_ext[1:]
+        mime_type = MIME_TYPES.get(file_ext)
+
+        if mime_type == MIME_TYPES.get("zip") and build_version is None:
+            raise Exception("Zip artifacts require a non-empty build version.")
+
+        data = {}
+        if build_version:
+            data["build_version"] = build_version
+
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in get_upload_url")
             try:
-                response = self.post(request_url, data={"build_version": build_version})
+                response = self.post(request_url, data=data)
                 if response.ok:
                     break
             except Exception as ex:
@@ -582,7 +601,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         app_name: str,
         binary_path: str,
         release_notes: str,
-        build_version: str,
+        build_version: Optional[str] = None,
         branch_name: Optional[str] = None,
         commit_hash: Optional[str] = None,
         commit_message: Optional[str] = None,
@@ -593,7 +612,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :param str app_name: The name of the app
         :param str binary_path: The path to the binary to upload
         :param str release_notes: The release notes for the release
-        :param srt build_version: The user defined build version of the app
+        :param Optional[str] build_version: The user defined build version of the app. Required for Windows zip artifacts
         :param Optional[str] branch_name: The git branch that the build came from
         :param Optional[str] commit_hash: The hash of the commit that was just built
         :param Optional[str] commit_message: The message of the commit that was just built
@@ -608,7 +627,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             raise FileNotFoundError(f"Could not find binary: {binary_path}")
 
         create_release_upload_response = self.get_upload_url(
-            owner_name=owner_name, app_name=app_name, build_version=build_version
+            owner_name=owner_name,
+            app_name=app_name,
+            build_version=build_version,
+            binary_path=binary_path,
         )
 
         success = self.upload_binary(
@@ -660,7 +682,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         binary_path: str,
         group_id: str,
         release_notes: str,
-        build_version: str,
+        build_version: Optional[str] = None,
         notify_testers: Optional[bool] = None,
         branch_name: Optional[str] = None,
         commit_hash: Optional[str] = None,
@@ -673,7 +695,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :param str binary_path: The path to the binary to upload
         :param str group_id: The ID of the group to release to
         :param str release_notes: The release notes for the release
-        :param srt build_version: The user defined build version of the app
+        :param Optional[str] build_version: The user defined build version of the app. Required for Windows zip artifacts
         :param Optional[bool] notify_testers: Set to True to notify testers about this build
         :param Optional[str] branch_name: The git branch that the build came from
         :param Optional[str] commit_hash: The hash of the commit that was just built

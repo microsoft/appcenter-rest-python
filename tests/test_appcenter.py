@@ -44,9 +44,7 @@ def get_from_keychain() -> Optional[str]:
         return None
 
     # The output is somewhat complex. We are looking for the line starting "password:"
-    password_lines = [
-        line for line in output.split("\n") if line.startswith("password: ")
-    ]
+    password_lines = [line for line in output.split("\n") if line.startswith("password: ")]
 
     if len(password_lines) != 1:
         raise Exception("Failed to get password from security output")
@@ -212,9 +210,7 @@ def test_release_details(owner_name: str, app_name: str, token: str):
 def test_latest_commit(owner_name: str, app_name: str, token: str):
     """Test release details."""
     client = appcenter.AppCenterClient(access_token=token)
-    commit_hash = client.versions.latest_commit(
-        owner_name=owner_name, app_name=app_name
-    )
+    commit_hash = client.versions.latest_commit(owner_name=owner_name, app_name=app_name)
     assert commit_hash is not None
 
 

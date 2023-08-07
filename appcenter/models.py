@@ -402,9 +402,7 @@ class DestinationId:
     name: Optional[str]
     identifier: Optional[str]
 
-    def __init__(
-        self, *, name: Optional[str] = None, identifier: Optional[str] = None
-    ) -> None:
+    def __init__(self, *, name: Optional[str] = None, identifier: Optional[str] = None) -> None:
         self.name = name
         self.identifier = identifier
 
@@ -452,9 +450,7 @@ class ReleaseUpdateRequest:
             output["mandatory_update"] = self.mandatory_update
 
         if self.destinations is not None:
-            output["destinations"] = [
-                destination.json() for destination in self.destinations
-            ]
+            output["destinations"] = [destination.json() for destination in self.destinations]
 
         if self.build is not None:
             output["build"] = self.build.json()

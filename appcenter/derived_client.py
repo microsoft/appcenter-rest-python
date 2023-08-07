@@ -148,9 +148,7 @@ class AppCenterDerivedClient:
         """
         return f"{API_BASE_URL}/v{version}"
 
-    def generate_url(
-        self, *, version: str = "0.1", owner_name: str, app_name: str
-    ) -> str:
+    def generate_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
         """Generate a URL to use for querying the API.
 
         :param str version: The API version to hit
@@ -206,9 +204,7 @@ class AppCenterDerivedClient:
 
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
-        response = self.session.patch(
-            url, headers={"Content-Type": "application/json"}, json=data
-        )
+        response = self.session.patch(url, headers={"Content-Type": "application/json"}, json=data)
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -230,9 +226,7 @@ class AppCenterDerivedClient:
 
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
-        response = self.session.post(
-            url, headers={"Content-Type": "application/json"}, json=data
-        )
+        response = self.session.post(url, headers={"Content-Type": "application/json"}, json=data)
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -266,9 +260,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post_files(
-        self, url: str, *, files: Dict[str, Tuple[str, BinaryIO]]
-    ) -> requests.Response:
+    def post_files(self, url: str, *, files: Dict[str, Tuple[str, BinaryIO]]) -> requests.Response:
         """Perform a POST request to a url, sending files
 
         :param url: The URL to run the POST on
@@ -314,9 +306,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def azure_blob_upload(
-        self, url: str, *, file_stream: BinaryIO
-    ) -> requests.Response:
+    def azure_blob_upload(self, url: str, *, file_stream: BinaryIO) -> requests.Response:
         """Upload a file to an Azure Blob Storage URL
 
         :param url: The URL to upload to

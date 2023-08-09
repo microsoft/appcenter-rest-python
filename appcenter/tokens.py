@@ -56,7 +56,9 @@ class AppCenterTokensClient(AppCenterDerivedClient):
 
         self.log.debug(f"Creating user token name={name}, scope={scope}")
 
-        response = self.post(request_url, data={"description": name, "scope": [scope.value]})
+        response = self.post(
+            request_url, data={"description": name, "scope": [scope.value]}
+        )
 
         return deserialize.deserialize(UserToken, response.json())
 

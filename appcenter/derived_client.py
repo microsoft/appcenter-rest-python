@@ -185,6 +185,11 @@ class AppCenterDerivedClient:
         """
 
         response = self.session.get(url)
+        
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
 
         if response.status_code != 200:
             raise create_exception(response)
@@ -209,6 +214,11 @@ class AppCenterDerivedClient:
         response = self.session.patch(
             url, headers={"Content-Type": "application/json"}, json=data
         )
+        
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -233,6 +243,11 @@ class AppCenterDerivedClient:
         response = self.session.post(
             url, headers={"Content-Type": "application/json"}, json=data
         )
+        
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -255,6 +270,11 @@ class AppCenterDerivedClient:
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = self.session.post(url, headers={}, data=data)
+
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -283,6 +303,11 @@ class AppCenterDerivedClient:
 
         response = self.session.post(url, files=files, timeout=20 * 60)
 
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
+
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
 
@@ -303,7 +328,12 @@ class AppCenterDerivedClient:
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = self.session.delete(url)
-
+        
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
+        
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
 
@@ -335,7 +365,12 @@ class AppCenterDerivedClient:
             },
             data=file_stream.read(),
         )
-
+        
+        # Check if the response is HTML
+        if 'text/html' in response.headers['Content-Type']:
+            self.log.info("The response is HTML")
+            self.log.info(f"Response: {response.text}")
+        
         if response.status_code < 200 or response.status_code >= 300:
             self.log.debug("Azure URL: " + url)
             raise create_exception(response)

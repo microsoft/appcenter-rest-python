@@ -350,7 +350,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         data = {"status": "committed"}
 
         response = self.patch(request_url, data=data)
-
+                
         return deserialize.deserialize(SymbolUploadEndRequest, response.json())
 
     def upload_symbols(

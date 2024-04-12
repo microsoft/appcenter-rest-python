@@ -112,6 +112,7 @@ def _is_connection_failure(exception: BaseException) -> bool:
         "Connection aborted.",
         "bad handshake: ",
         "Failed to establish a new connection",
+        "Service unavailable",
     ]
 
     for check in exception_checks:
@@ -174,7 +175,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def get(self, url: str) -> requests.Response:
+    def get(self, url: str, *, expected_content_type: str = "application/json") -> requests.Response:
         """Perform a GET request to a url
 
         :param url: The URL to run the GET on
@@ -185,6 +186,10 @@ class AppCenterDerivedClient:
         """
 
         response = self.session.get(url)
+        
+
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
 
         if response.status_code != 200:
             raise create_exception(response)
@@ -196,7 +201,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def patch(self, url: str, *, data: Any) -> requests.Response:
+    def patch(self, url: str, *, expected_content_type: str = "application/json", data: Any) -> requests.Response:
         """Perform a PATCH request to a url
 
         :param url: The URL to run the POST on
@@ -209,6 +214,9 @@ class AppCenterDerivedClient:
         response = self.session.patch(
             url, headers={"Content-Type": "application/json"}, json=data
         )
+        
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -220,7 +228,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post(self, url: str, *, data: Any) -> requests.Response:
+    def post(self, url: str, *, expected_content_type: str = "application/json", data: Any) -> requests.Response:
         """Perform a POST request to a url
 
         :param url: The URL to run the POST on
@@ -233,6 +241,9 @@ class AppCenterDerivedClient:
         response = self.session.post(
             url, headers={"Content-Type": "application/json"}, json=data
         )
+        
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -244,7 +255,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post_raw_data(self, url: str, data: Any) -> requests.Response:
+    def post_raw_data(self, url: str, *, expected_content_type: str = "application/json", data: Any) -> requests.Response:
         """Perform a POST request to a url
 
         :param url: The URL to run the POST on
@@ -255,6 +266,9 @@ class AppCenterDerivedClient:
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = self.session.post(url, headers={}, data=data)
+
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
 
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
@@ -267,7 +281,7 @@ class AppCenterDerivedClient:
         stop=stop_after_attempt(3),
     )
     def post_files(
-        self, url: str, *, files: Dict[str, Tuple[str, BinaryIO]]
+        self, url: str, *, expected_content_type: str = "application/json", files: Dict[str, Tuple[str, BinaryIO]]
     ) -> requests.Response:
         """Perform a POST request to a url, sending files
 
@@ -283,6 +297,9 @@ class AppCenterDerivedClient:
 
         response = self.session.post(url, files=files, timeout=20 * 60)
 
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
+
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
 
@@ -293,7 +310,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def delete(self, url: str) -> requests.Response:
+    def delete(self, url: str, *, expected_content_type: str = "application/json") -> requests.Response:
         """Perform a DELETE request to a url
 
         :param url: The URL to run the DELETE on
@@ -303,7 +320,10 @@ class AppCenterDerivedClient:
         :raises AppCenterHTTPException: If the request fails with a non 200 status code
         """
         response = self.session.delete(url)
-
+        
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
+        
         if response.status_code < 200 or response.status_code >= 300:
             raise create_exception(response)
 
@@ -315,7 +335,7 @@ class AppCenterDerivedClient:
         stop=stop_after_attempt(3),
     )
     def azure_blob_upload(
-        self, url: str, *, file_stream: BinaryIO
+        self, url: str, *, expected_content_type: str = "application/json", file_stream: BinaryIO
     ) -> requests.Response:
         """Upload a file to an Azure Blob Storage URL
 
@@ -335,7 +355,10 @@ class AppCenterDerivedClient:
             },
             data=file_stream.read(),
         )
-
+        
+        if response.headers.get("Content-Type") != expected_content_type:
+            raise AppCenterHTTPException(response)
+        
         if response.status_code < 200 or response.status_code >= 300:
             self.log.debug("Azure URL: " + url)
             raise create_exception(response)

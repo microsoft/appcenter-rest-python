@@ -24,11 +24,11 @@ for version in client.versions.all(owner_name="owner", app_name="myapp"):
 client.versions.upload_and_release(
     owner_name="owner",
     app_name="myapp",
-    version="0.1",
-    build_number="123",
     binary_path="/path/to/some.ipa",
     group_id="12345678-abcd-9012-efgh-345678901234",
     release_notes="These are some release notes",
+    build_version="0.1",
+    notify_testers=True,
     branch_name="test_branch",
     commit_hash="1234567890123456789012345678901234567890",
     commit_message="This is a commit message"

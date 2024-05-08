@@ -9,7 +9,6 @@ import os
 import re
 import subprocess
 import sys
-from typing import List, Optional
 import uuid
 
 import pytest
@@ -22,7 +21,7 @@ import appcenter
 # pylint: disable=redefined-outer-name
 
 
-def get_from_keychain() -> Optional[str]:
+def get_from_keychain() -> str | None:
     """Get the test details from the keychain.
 
     :returns: A string with the details (colon separated)
@@ -44,9 +43,7 @@ def get_from_keychain() -> Optional[str]:
         return None
 
     # The output is somewhat complex. We are looking for the line starting "password:"
-    password_lines = [
-        line for line in output.split("\n") if line.startswith("password: ")
-    ]
+    password_lines = [line for line in output.split("\n") if line.startswith("password: ")]
 
     if len(password_lines) != 1:
         raise Exception("Failed to get password from security output")
@@ -71,7 +68,7 @@ def get_from_keychain() -> Optional[str]:
     return password
 
 
-def get_tokens() -> List[str]:
+def get_tokens() -> list[str]:
     """Get the tokens for authentication.
 
     :returns: The owner name, app name and token as a tuple.
@@ -212,9 +209,7 @@ def test_release_details(owner_name: str, app_name: str, token: str):
 def test_latest_commit(owner_name: str, app_name: str, token: str):
     """Test release details."""
     client = appcenter.AppCenterClient(access_token=token)
-    commit_hash = client.versions.latest_commit(
-        owner_name=owner_name, app_name=app_name
-    )
+    commit_hash = client.versions.latest_commit(owner_name=owner_name, app_name=app_name)
     assert commit_hash is not None
 
 

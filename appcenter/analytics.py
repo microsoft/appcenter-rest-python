@@ -4,7 +4,6 @@
 # Licensed under the MIT license.
 
 import logging
-from typing import List
 
 import deserialize
 
@@ -27,13 +26,13 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
         *,
         owner_name: str,
         app_name: str,
-        releases: List[ReleaseWithDistributionGroup],
+        releases: list[ReleaseWithDistributionGroup],
     ) -> ReleaseCounts:
         """Get the release counts for an app
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
-        :param List[ReleaseWithDistributionGroup] releases: The list of releases to get the counts for
+        :param list[ReleaseWithDistributionGroup] releases: The list of releases to get the counts for
 
         :returns: The release counts
         """

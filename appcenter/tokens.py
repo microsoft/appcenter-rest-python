@@ -5,7 +5,6 @@
 
 import enum
 import logging
-from typing import List, Union
 
 import deserialize
 
@@ -29,7 +28,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("tokens", token, parent_logger)
 
-    def get_user_tokens(self) -> List[UserToken]:
+    def get_user_tokens(self) -> list[UserToken]:
         """Get the users tokens
 
         :returns: The tokens
@@ -42,7 +41,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
 
         response = self.get(request_url)
 
-        return deserialize.deserialize(List[UserToken], response.json())
+        return deserialize.deserialize(list[UserToken], response.json())
 
     def create_user_token(self, name: str, scope: TokenScope) -> UserToken:
         """Create a user token.
@@ -56,13 +55,11 @@ class AppCenterTokensClient(AppCenterDerivedClient):
 
         self.log.debug(f"Creating user token name={name}, scope={scope}")
 
-        response = self.post(
-            request_url, data={"description": name, "scope": [scope.value]}
-        )
+        response = self.post(request_url, data={"description": name, "scope": [scope.value]})
 
         return deserialize.deserialize(UserToken, response.json())
 
-    def delete_user_token(self, token: Union[str, UserToken]) -> None:
+    def delete_user_token(self, token: str | UserToken) -> None:
         """Delete a user token.
 
         :param token: The token itself or the ID for the token

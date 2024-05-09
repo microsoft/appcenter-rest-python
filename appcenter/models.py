@@ -5,12 +5,12 @@
 
 import datetime
 import enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import deserialize
 
 
-def iso8601parse(date_string: Optional[str]) -> Optional[datetime.datetime]:
+def iso8601parse(date_string: str | None) -> datetime.datetime | None:
     """Parse an ISO8601 date string into a datetime.
 
     :param date_string: The date string to parse
@@ -40,19 +40,19 @@ class HandledErrorReasonFrame:
         JAVA = "Java"
         UNKNOWN = "Unknown"
 
-    className: Optional[str]  # name of the class
-    method: Optional[str]  # name of the method
-    classMethod: Optional[bool]  # is a class method
-    file: Optional[str]  # name of the file
-    line: Optional[int]  # line number
-    appCode: Optional[bool]  # this line isn't from any framework
-    frameworkName: Optional[str]  # Name of the framework
-    codeFormatted: Optional[str]  # Formatted frame string
-    codeRaw: Optional[str]  # Unformatted Frame string
-    methodParams: Optional[str]  # parameters of the frames method
-    exceptionType: Optional[str]  # Exception type.
-    osExceptionType: Optional[str]  # OS exception type. (aka. SIGNAL)
-    language: Optional[ProgrammingLanguage]  # programming language of the frame
+    className: str | None  # name of the class
+    method: str | None  # name of the method
+    classMethod: bool | None  # is a class method
+    file: str | None  # name of the file
+    line: int | None  # line number
+    appCode: bool | None  # this line isn't from any framework
+    frameworkName: str | None  # Name of the framework
+    codeFormatted: str | None  # Formatted frame string
+    codeRaw: str | None  # Unformatted Frame string
+    methodParams: str | None  # parameters of the frames method
+    exceptionType: str | None  # Exception type.
+    osExceptionType: str | None  # OS exception type. (aka. SIGNAL)
+    language: ProgrammingLanguage | None  # programming language of the frame
 
 
 class ErrorGroupState(enum.Enum):
@@ -65,89 +65,89 @@ class ErrorGroupState(enum.Enum):
 @deserialize.parser("lastOccurrence", iso8601parse)
 class ErrorGroupListItem:
     state: ErrorGroupState
-    annotation: Optional[str]
+    annotation: str | None
     errorGroupId: str
     appVersion: str
-    appBuild: Optional[str]
+    appBuild: str | None
     count: int
     deviceCount: int
     firstOccurrence: datetime.datetime
     lastOccurrence: datetime.datetime
-    exceptionType: Optional[str]
-    exceptionMessage: Optional[str]
-    exceptionClassName: Optional[str]
-    exceptionClassMethod: Optional[bool]
-    exceptionMethod: Optional[str]
-    exceptionAppCode: Optional[bool]
-    exceptionFile: Optional[str]
-    exceptionLine: Optional[str]
-    codeRaw: Optional[str]
-    reasonFrames: Optional[List[HandledErrorReasonFrame]]
+    exceptionType: str | None
+    exceptionMessage: str | None
+    exceptionClassName: str | None
+    exceptionClassMethod: bool | None
+    exceptionMethod: str | None
+    exceptionAppCode: bool | None
+    exceptionFile: str | None
+    exceptionLine: str | None
+    codeRaw: str | None
+    reasonFrames: list[HandledErrorReasonFrame] | None
 
 
 class ErrorGroups:
-    nextLink: Optional[str]
-    errorGroups: Optional[List[ErrorGroupListItem]]
+    nextLink: str | None
+    errorGroups: list[ErrorGroupListItem] | None
 
 
 @deserialize.parser("firstOccurrence", iso8601parse)
 @deserialize.parser("lastOccurrence", iso8601parse)
 class ErrorGroup:
     state: ErrorGroupState
-    annotation: Optional[str]
+    annotation: str | None
     errorGroupId: str
     appVersion: str
-    appBuild: Optional[str]
+    appBuild: str | None
     count: int
     deviceCount: int
     firstOccurrence: datetime.datetime
     lastOccurrence: datetime.datetime
-    exceptionType: Optional[str]
-    exceptionMessage: Optional[str]
-    exceptionClassName: Optional[str]
-    exceptionClassMethod: Optional[bool]
-    exceptionMethod: Optional[str]
-    exceptionAppCode: Optional[bool]
-    exceptionFile: Optional[str]
-    exceptionLine: Optional[str]
-    codeRaw: Optional[str]
-    reasonFrames: Optional[List[HandledErrorReasonFrame]]
+    exceptionType: str | None
+    exceptionMessage: str | None
+    exceptionClassName: str | None
+    exceptionClassMethod: bool | None
+    exceptionMethod: str | None
+    exceptionAppCode: bool | None
+    exceptionFile: str | None
+    exceptionLine: str | None
+    codeRaw: str | None
+    reasonFrames: list[HandledErrorReasonFrame] | None
 
 
 @deserialize.parser("timestamp", iso8601parse)
 class HandledError:
-    errorId: Optional[str]
-    timestamp: Optional[datetime.datetime]
-    deviceName: Optional[str]
-    osVersion: Optional[str]
-    osType: Optional[str]
-    country: Optional[str]
-    language: Optional[str]
-    userId: Optional[str]
+    errorId: str | None
+    timestamp: datetime.datetime | None
+    deviceName: str | None
+    osVersion: str | None
+    osType: str | None
+    country: str | None
+    language: str | None
+    userId: str | None
 
 
 class HandledErrors:
-    nextLink: Optional[str]
-    errors: Optional[List[HandledError]]
+    nextLink: str | None
+    errors: list[HandledError] | None
 
 
 @deserialize.parser("timestamp", iso8601parse)
 @deserialize.parser("appLaunchTimestamp", iso8601parse)
 class HandledErrorDetails:
-    errorId: Optional[str]
-    timestamp: Optional[datetime.datetime]
-    deviceName: Optional[str]
-    osVersion: Optional[str]
-    osType: Optional[str]
-    country: Optional[str]
-    language: Optional[str]
-    userId: Optional[str]
-    name: Optional[str]
-    reasonFrames: Optional[List[HandledErrorReasonFrame]]
-    appLaunchTimestamp: Optional[datetime.datetime]
-    carrierName: Optional[str]
-    jailbreak: Optional[bool]
-    properties: Optional[Dict[str, str]]
+    errorId: str | None
+    timestamp: datetime.datetime | None
+    deviceName: str | None
+    osVersion: str | None
+    osType: str | None
+    country: str | None
+    language: str | None
+    userId: str | None
+    name: str | None
+    reasonFrames: list[HandledErrorReasonFrame] | None
+    appLaunchTimestamp: datetime.datetime | None
+    carrierName: str | None
+    jailbreak: bool | None
+    properties: dict[str, str | None]
 
 
 class ReleaseOrigin(enum.Enum):
@@ -157,21 +157,21 @@ class ReleaseOrigin(enum.Enum):
 
 @deserialize.auto_snake()
 class BuildInfo:
-    branch_name: Optional[str]
-    commit_hash: Optional[str]
-    commit_message: Optional[str]
+    branch_name: str | None
+    commit_hash: str | None
+    commit_message: str | None
 
     def __init__(
         self,
-        branch_name: Optional[str] = None,
-        commit_hash: Optional[str] = None,
-        commit_message: Optional[str] = None,
+        branch_name: str | None = None,
+        commit_hash: str | None = None,
+        commit_message: str | None = None,
     ) -> None:
         self.branch_name = branch_name
         self.commit_hash = commit_hash
         self.commit_message = commit_message
 
-    def json(self) -> Dict[str, Any]:
+    def json(self) -> dict[str, Any]:
         result = {}
 
         if self.branch_name is not None:
@@ -203,12 +203,12 @@ class DestinationType(enum.Enum):
 @deserialize.key("store_type", "type")
 class Destination:
     identifier: str
-    name: Optional[str]
-    is_latest: Optional[bool]
-    store_type: Optional[StoreType]
-    publishing_status: Optional[str]
-    destination_type: Optional[DestinationType]
-    display_name: Optional[str]
+    name: str | None
+    is_latest: bool | None
+    store_type: StoreType | None
+    publishing_status: str | None
+    destination_type: DestinationType | None
+    display_name: str | None
 
 
 @deserialize.key("identifier", "id")
@@ -216,12 +216,12 @@ class Destination:
 class BasicReleaseDetailsResponse:
     identifier: int
     version: str
-    origin: Optional[ReleaseOrigin]
+    origin: ReleaseOrigin | None
     short_version: str
     enabled: bool
     uploaded_at: datetime.datetime
-    destinations: Optional[List[Destination]]
-    build: Optional[BuildInfo]
+    destinations: list[Destination] | None
+    build: BuildInfo | None
 
 
 class ProvisioningProfileType(enum.Enum):
@@ -244,84 +244,84 @@ class ReleaseDetailsResponse:
     app_display_name: str
 
     # The app's OS.
-    app_os: Optional[str]
+    app_os: str | None
 
     # The release's version.
     version: str
 
     # The release's origin
-    origin: Optional[ReleaseOrigin]
+    origin: ReleaseOrigin | None
 
     # The release's short version.
     short_version: str
 
     # The release's release notes.
-    release_notes: Optional[str]
+    release_notes: str | None
 
     # The release's provisioning profile name.
-    provisioning_profile_name: Optional[str]
+    provisioning_profile_name: str | None
 
     # The type of the provisioning profile for the requested app version.
-    provisioning_profile_type: Optional[ProvisioningProfileType]
+    provisioning_profile_type: ProvisioningProfileType | None
 
     # expiration date of provisioning profile in UTC format.
-    provisioning_profile_expiry_date: Optional[datetime.datetime]
+    provisioning_profile_expiry_date: datetime.datetime | None
 
     # A flag that determines whether the release's provisioning profile is still extracted or not.
-    is_provisioning_profile_syncing: Optional[bool]
+    is_provisioning_profile_syncing: bool | None
 
     # The release's size in bytes.
-    size: Optional[int]
+    size: int | None
 
     # The release's minimum required operating system.
-    min_os: Optional[str]
+    min_os: str | None
 
     # The release's device family.
-    device_family: Optional[str]
+    device_family: str | None
 
     # The release's minimum required Android API level.
-    android_min_api_level: Optional[str]
+    android_min_api_level: str | None
 
     # The identifier of the apps bundle.
-    bundle_identifier: Optional[str]
+    bundle_identifier: str | None
 
     # Hashes for the packages
-    package_hashes: Optional[List[str]]
+    package_hashes: list[str | None]
 
     # MD5 checksum of the release binary.
-    fingerprint: Optional[str]
+    fingerprint: str | None
 
     # The uploaded time.
     uploaded_at: datetime.datetime
 
     # The URL that hosts the binary for this release.
-    download_url: Optional[str]
+    download_url: str | None
 
     # A URL to the app's icon.
-    app_icon_url: Optional[str]
+    app_icon_url: str | None
 
     # The href required to install a release on a mobile device. On iOS devices will be prefixed
     # with itms-services://?action=download-manifest&url=
-    install_url: Optional[str]
+    install_url: str | None
 
-    destinations: Optional[List[Destination]]
+    destinations: list[Destination] | None
 
     # In calls that allow passing udid in the query string, this value will hold the provisioning
     # status of that UDID in this release. Will be ignored for non-iOS platforms.
-    is_udid_provisioned: Optional[bool]
+    is_udid_provisioned: bool | None
 
     # In calls that allow passing udid in the query string, this value determines if a release can
     # be re-signed. When true, after a re-sign, the tester will be able to install the release from
     # his registered devices. Will not be returned for non-iOS platforms.
-    can_resign: Optional[bool]
+    can_resign: bool | None
 
-    build: Optional[BuildInfo]
+    build: BuildInfo | None
 
     # This value determines the whether a release currently is enabled or disabled.
     enabled: bool
 
     # Status of the release.
-    status: Optional[str]
+    status: str | None
 
 
 class ReleaseWithDistributionGroup:
@@ -335,14 +335,14 @@ class ReleaseWithDistributionGroup:
 
 class ReleaseCount:
     release_id: str
-    distribution_group: Optional[str]
+    distribution_group: str | None
     unique_count: int
     total_count: int
 
 
 class ReleaseCounts:
-    total: Optional[int]
-    counts: List[ReleaseCount]
+    total: int | None
+    counts: list[ReleaseCount]
 
 
 @deserialize.key("identifier", "id")
@@ -351,7 +351,7 @@ class SetUploadMetadataResponse:
     error: bool
     chunk_size: int
     resume_restart: bool
-    chunk_list: List[int]
+    chunk_list: list[int]
     blob_partitions: int
     status_code: str
 
@@ -375,7 +375,7 @@ class CreateReleaseUploadResponse:
 class CommitUploadResponse:
     identifier: str
     upload_status: str
-    release_distinct_id: Optional[int]
+    release_distinct_id: int | None
 
 
 @deserialize.key("identifier", "id")
@@ -383,7 +383,7 @@ class UploadCompleteResponse:
     absolute_uri: str
     chunk_num: int
     error: bool
-    error_code: Optional[str]
+    error_code: str | None
     location: str
     message: str
     raw_location: str
@@ -394,22 +394,20 @@ class UploadCompleteResponse:
 class ReleaseDestinationResponse:
     identifier: str
     mandatory_update: bool
-    provisioning_status_url: Optional[str]
+    provisioning_status_url: str | None
 
 
 @deserialize.key("identifier", "id")
 class DestinationId:
-    name: Optional[str]
-    identifier: Optional[str]
+    name: str | None
+    identifier: str | None
 
-    def __init__(
-        self, *, name: Optional[str] = None, identifier: Optional[str] = None
-    ) -> None:
+    def __init__(self, *, name: str | None = None, identifier: str | None = None) -> None:
         self.name = name
         self.identifier = identifier
 
-    def json(self) -> Dict[str, Any]:
-        result: Dict[str, Any] = {}
+    def json(self) -> dict[str, Any]:
+        result: dict[str, Any] = {}
 
         if self.name is not None:
             result["name"] = self.name
@@ -421,20 +419,20 @@ class DestinationId:
 
 
 class ReleaseUpdateRequest:
-    release_notes: Optional[str]
-    mandatory_update: Optional[bool]
-    destinations: Optional[List[DestinationId]]
-    build: Optional[BuildInfo]
-    notify_testers: Optional[bool]
+    release_notes: str | None
+    mandatory_update: bool | None
+    destinations: list[DestinationId] | None
+    build: BuildInfo | None
+    notify_testers: bool | None
 
     def __init__(
         self,
         *,
-        release_notes: Optional[str] = None,
-        mandatory_update: Optional[bool] = None,
-        destinations: Optional[List[DestinationId]] = None,
-        build: Optional[BuildInfo] = None,
-        notify_testers: Optional[bool] = None,
+        release_notes: str | None = None,
+        mandatory_update: bool | None = None,
+        destinations: list[DestinationId] | None = None,
+        build: BuildInfo | None = None,
+        notify_testers: bool | None = None,
     ) -> None:
         self.release_notes = release_notes
         self.mandatory_update = mandatory_update
@@ -442,8 +440,8 @@ class ReleaseUpdateRequest:
         self.build = build
         self.notify_testers = notify_testers
 
-    def json(self) -> Dict[str, Any]:
-        output: Dict[str, Any] = {}
+    def json(self) -> dict[str, Any]:
+        output: dict[str, Any] = {}
 
         if self.release_notes is not None:
             output["release_notes"] = self.release_notes
@@ -452,9 +450,7 @@ class ReleaseUpdateRequest:
             output["mandatory_update"] = self.mandatory_update
 
         if self.destinations is not None:
-            output["destinations"] = [
-                destination.json() for destination in self.destinations
-            ]
+            output["destinations"] = [destination.json() for destination in self.destinations]
 
         if self.build is not None:
             output["build"] = self.build.json()
@@ -514,10 +510,10 @@ class User:
     identifier: str
 
     # The avatar URL of the user
-    avatar_url: Optional[str]
+    avatar_url: str | None
 
     # User is required to send an old password in order to change the password
-    can_change_password: Optional[bool]
+    can_change_password: bool | None
 
     # The full name of the user. Might for example be first and last name
     display_name: str
@@ -529,7 +525,7 @@ class User:
     name: str
 
     # The permissions the user has for the app
-    permissions: List[Permission]
+    permissions: list[Permission]
 
     # The creation origin of this user
     origin: Origin
@@ -545,10 +541,10 @@ class UserToken:
     description: str
 
     # The scope the token has
-    scope: List[str]
+    scope: list[str]
 
     # The creation date
     created_at: datetime.datetime
 
     # The value of the token - Only set when creating a new tokern
-    api_token: Optional[str]
+    api_token: str | None

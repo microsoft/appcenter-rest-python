@@ -5,13 +5,7 @@
 
 """App Center API wrapper."""
 
-import json
 import logging
-import re
-import time
-from typing import Any, ClassVar, Dict, List, Optional
-
-import requests
 
 from appcenter.account import AppCenterAccountClient
 from appcenter.analytics import AppCenterAnalyticsClient
@@ -35,9 +29,7 @@ class AppCenterClient:
     tokens: AppCenterTokensClient
     versions: AppCenterVersionsClient
 
-    def __init__(
-        self, *, access_token: str, parent_logger: Optional[logging.Logger] = None
-    ) -> None:
+    def __init__(self, *, access_token: str, parent_logger: logging.Logger | None = None) -> None:
         """Initialize the AppCenterClient with the application id and the token."""
 
         if parent_logger is None:

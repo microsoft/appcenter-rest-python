@@ -6,7 +6,7 @@
 import datetime
 import logging
 import os
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Iterator
 import urllib.parse
 
 from azure.storage.blob import BlockBlobService
@@ -39,9 +39,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("crashes", token, parent_logger)
 
-    def group_details(
-        self, *, owner_name: str, app_name: str, error_group_id: str
-    ) -> ErrorGroup:
+    def group_details(self, *, owner_name: str, app_name: str, error_group_id: str) -> ErrorGroup:
         """Get the error group details.
 
         :param str owner_name: The name of the app account owner
@@ -95,13 +93,11 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         """
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
-        request_url += (
-            f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
-        )
+        request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
 
         response = self.get(request_url)
 
-        return deserialize.deserialize(Dict[str, Any], response.json())
+        return deserialize.deserialize(dict[str, Any], response.json())
 
     def set_annotation(
         self,
@@ -110,7 +106,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         app_name: str,
         error_group_id: str,
         annotation: str,
-        state: Optional[ErrorGroupState] = None,
+        state: ErrorGroupState | None = None,
     ) -> None:
         """Get the error group details.
 
@@ -118,7 +114,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str app_name: The name of the app
         :param str error_group_id: The ID of the error group to set the annotation on
         :param str annotation: The annotation text
-        :param Optional[ErrorGroupState] state: The state to set the error group to
+        :param ErrorGroupState | None state: The state to set the error group to
 
         The `state` parameter here does seem somewhat unusual, but it can't be
         helped unfortunately. The API requires that we set the state with the
@@ -141,18 +137,19 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         self.patch(request_url, data={"state": state.value, "annotation": annotation})
 
+    # pylint: disable=too-many-arguments
     def get_error_groups(
         self,
         *,
         owner_name: str,
         app_name: str,
         start_time: datetime.datetime,
-        end_time: Optional[datetime.datetime] = None,
-        version: Optional[str] = None,
-        app_build: Optional[str] = None,
-        group_state: Optional[ErrorGroupState] = None,
-        error_type: Optional[str] = None,
-        order_by: Optional[str] = None,
+        end_time: datetime.datetime | None = None,
+        version: str | None = None,
+        app_build: str | None = None,
+        group_state: ErrorGroupState | None = None,
+        error_type: str | None = None,
+        order_by: str | None = None,
         limit: int = 30,
     ) -> Iterator[ErrorGroupListItem]:
         """Get the error groups for an app.
@@ -160,13 +157,13 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
         :param datetime.datetime start_time: The time to start getting error groups from
-        :param Optional[datetime.datetime] end_time: The end time to get error groups from
-        :param Optional[str] version: The version of the app to restrict the search to (if any)
-        :param Optional[str] app_build: The build to restrict the search to (if any)
-        :param Optional[ErrorGroupState] group_state: Set to filter to just this group state (open, closed, ignored)
-        :param Optional[str] error_type: Set to filter to specific types of error (all, unhandledError, handledError)
-        :param Optional[str] order_by: The order by parameter to pass in (this will be encoded for you)
-        :param Optional[str] limit: The max number of results to return per request (should not go past 100)
+        :param datetime.datetime | None end_time: The end time to get error groups from
+        :param str | None version: The version of the app to restrict the search to (if any)
+        :param str | None app_build: The build to restrict the search to (if any)
+        :param ErrorGroupState | None group_state: Set to filter to just this group state (open, closed, ignored)
+        :param str | None error_type: Set to filter to specific types of error (all, unhandledError, handledError)
+        :param str | None order_by: The order by parameter to pass in (this will be encoded for you)
+        :param str | None limit: The max number of results to return per request (should not go past 100)
 
         :returns: An iterator of ErrorGroupListItem
         """
@@ -223,26 +220,28 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         # pylint: disable=too-many-locals
 
+    # pylint: enable=too-many-arguments
+
     def errors_in_group(
         self,
         *,
         owner_name: str,
         app_name: str,
         error_group_id: str,
-        start_time: Optional[datetime.datetime] = None,
-        end_time: Optional[datetime.datetime] = None,
-        model: Optional[str] = None,
-        operating_system: Optional[str] = None,
+        start_time: datetime.datetime | None = None,
+        end_time: datetime.datetime | None = None,
+        model: str | None = None,
+        operating_system: str | None = None,
     ) -> Iterator[HandledError]:
         """Get the errors in a group.
 
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
         :param str error_group_id: The ID of the group to get the errors from
-        :param Optional[datetime.datetime] start_time: The time to start getting error groups from
-        :param Optional[datetime.datetime] end_time: The end time to get error groups from
-        :param Optional[str] model: The device model to restrict the search to (if any)
-        :param Optional[str] operating_system: The OS to restrict the search to (if any)
+        :param datetime.datetime | None start_time: The time to start getting error groups from
+        :param datetime.datetime | None end_time: The end time to get error groups from
+        :param str | None model: The device model to restrict the search to (if any)
+        :param str | None operating_system: The OS to restrict the search to (if any)
 
         :returns: An iterator of HandledError
         """
@@ -250,7 +249,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors?"
 
-        parameters: Dict[str, str] = {}
+        parameters: dict[str, str] = {}
 
         if start_time:
             parameters["start"] = start_time.replace(microsecond=0).isoformat()
@@ -293,8 +292,8 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         app_name: str,
         symbols_name: str,
         symbol_type: SymbolType,
-        build_number: Optional[str] = None,
-        version: Optional[str] = None,
+        build_number: str | None = None,
+        version: str | None = None,
     ) -> SymbolUploadBeginResponse:
         """Upload debug symbols
 
@@ -302,8 +301,8 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str app_name: The name of the app
         :param str symbols_path: The path to the symbols
         :param str symbol_type: The type of symbols being uploaded
-        :param Optional[str] build_number: The build number (required for Android)
-        :param Optional[str] version: The build version (required for Android)
+        :param str | None build_number: The build number (required for Android)
+        :param str | None version: The build version (required for Android)
 
         :raises ValueError: If the build number or version aren't specified and it's an Android upload
 
@@ -353,17 +352,18 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         return deserialize.deserialize(SymbolUploadEndRequest, response.json())
 
+    # pylint: disable=too-many-arguments
     def upload_symbols(
         self,
         *,
         owner_name: str,
         app_name: str,
         symbols_path: str,
-        symbols_name: Optional[str] = None,
+        symbols_name: str | None = None,
         symbol_type: SymbolType,
-        build_number: Optional[str] = None,
-        version: Optional[str] = None,
-        progress_callback: Optional[ProgressCallback] = None,
+        build_number: str | None = None,
+        version: str | None = None,
+        progress_callback: ProgressCallback | None = None,
     ) -> None:
         """Upload debug symbols
 
@@ -372,9 +372,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :param str symbols_path: The path to the symbols
         :param str symbols_name: The name to use for the symbols (defaults to file basename)
         :param str symbol_type: The type of symbols being uploaded
-        :param Optional[str] build_number: The build number (required for Android)
-        :param Optional[str] version: The build version (required for Android)
-        :param Optional[ProgressCallback] progress_callback: The upload progress callback
+        :param str | None build_number: The build number (required for Android)
+        :param str | None version: The build version (required for Android)
+        :param ProgressCallback | None progress_callback: The upload progress callback
 
         For the upload progress callback, this is a callable where the first
         parameter is the number of bytes uploaded, and the second parameter is
@@ -403,9 +403,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             url_components = urllib.parse.urlparse(begin_upload_response.upload_url)
             path = url_components.path[1:]
             container, blob_name = path.split("/")
-            connection_string = (
-                f"BlobEndpoint={url_components.scheme}://{url_components.netloc};"
-            )
+            connection_string = f"BlobEndpoint={url_components.scheme}://{url_components.netloc};"
             connection_string += f"SharedAccessSignature={url_components.query}"
             service = BlockBlobService(connection_string=connection_string)
             service.create_blob_from_stream(
@@ -421,9 +419,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         if commit_response.status != SymbolUploadStatus.COMMITTED:
             raise Exception("Failed to upload symbols")
 
-    def _next_link_polished(
-        self, next_link: str, owner_name: str, app_name: str
-    ) -> str:
+    # pylint: enable=too-many-arguments
+
+    def _next_link_polished(self, next_link: str, owner_name: str, app_name: str) -> str:
         """Polish nextLink string gotten from AppCenter service
 
         :param str next_link: The nextLink property from a service response when items are queried in batches

@@ -4,7 +4,6 @@
 # Licensed under the MIT license.
 
 import logging
-from typing import List, Optional
 import urllib.parse
 
 import deserialize
@@ -23,7 +22,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("account", token, parent_logger)
 
-    def users(self, *, owner_name: str, app_name: str) -> List[User]:
+    def users(self, *, owner_name: str, app_name: str) -> list[User]:
         """Get the users for an app
 
         :param str owner_name: The name of the app account owner
@@ -39,7 +38,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
 
         response = self.get(request_url)
 
-        return deserialize.deserialize(List[User], response.json())
+        return deserialize.deserialize(list[User], response.json())
 
     def add_collaborator(
         self,
@@ -47,7 +46,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         owner_name: str,
         app_name: str,
         user_email: str,
-        role: Optional[Role] = None,
+        role: Role | None = None,
     ) -> None:
         """Add a user as a collaborator to an app.
 
@@ -57,14 +56,12 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         :param str owner_name: The name of the app account owner
         :param str app_name: The name of the app
         :param str user_email: The email of the user
-        :param Optional[Role] role: The role the user should have (this is required for new users)
+        :param Role | None role: The role the user should have (this is required for new users)
 
         :returns: The list of users
         """
 
-        self.log.info(
-            f"Adding user {user_email} as collaborator on: {owner_name}/{app_name}"
-        )
+        self.log.info(f"Adding user {user_email} as collaborator on: {owner_name}/{app_name}")
 
         request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
         request_url += "/invitations"
@@ -76,9 +73,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
 
         self.post(request_url, data=data)
 
-    def delete_collaborator(
-        self, *, owner_name: str, app_name: str, user_email: str
-    ) -> None:
+    def delete_collaborator(self, *, owner_name: str, app_name: str, user_email: str) -> None:
         """Remove a user as a collaborator from an app.
 
         :param str owner_name: The name of the app account owner

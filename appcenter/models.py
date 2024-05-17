@@ -502,6 +502,7 @@ class Role(enum.Enum):
     ADMIN = "admin"
     COLLABORATOR = "collaborator"
     MEMBER = "member"
+    MAINTAINER = "maintainer"
 
 
 @deserialize.key("identifier", "id")
@@ -548,3 +549,137 @@ class UserToken:
 
     # The value of the token - Only set when creating a new tokern
     api_token: str | None
+
+
+@deserialize.parser("joined_at", iso8601parse)
+class OrganizationUserResponse:
+    # The email address of the user
+    email: str
+
+    # The full name of the user. Might for example be first and last name
+    display_name: str
+
+    # The date when the user joined the organization
+    joined_at: datetime.datetime | None
+
+    # The unique name that is used to identify the user.
+    name: str
+
+    # The role the user has within the organization
+    role: Role
+
+
+@deserialize.key("identifier", "id")
+class TeamResponse:
+    # The unique ID of the team
+    identifier: str
+
+    # The name of the team
+    name: str
+
+    # The display name of the team
+    display_name: str
+
+    # The description of the team
+    description: str | None
+
+
+class OwnerType(enum.Enum):
+    ORG = "org"
+    USER = "user"
+
+
+@deserialize.key("identifier", "id")
+class Owner:
+    # The unique id (UUID) of the owner
+    id: str
+
+    # The avatar URL of the owner
+    avatar_url: str | None
+
+    # The owner's display name
+    display_name: str
+
+    # The owner's email address
+    email: str | None
+
+    # The unique name that used to identify the owner
+    name: str
+
+    # The owner type. Can either be 'org' or 'user'
+    type: OwnerType
+
+
+class AzureSubscriptionResponse:
+
+    # The azure subscription id
+    subscription_id: str
+
+    # The tenant id of the azure subscription belongs to
+    tenant_id: str
+
+    # The name of the azure subscription
+    subscription_name: str
+
+    # If the subscription is used for billing
+    is_billing: bool | None
+
+    # If the subscription can be used for billing
+    is_billable: bool | None
+
+    # If the subscription is internal Microsoft subscription
+    is_microsoft_internal: bool | None
+
+
+@deserialize.parser("created_at", iso8601parse)
+@deserialize.parser("updated_at", iso8601parse)
+class AppResponse:
+
+    # The unique ID (UUID) of the app
+    id: str
+
+    # The description of the app
+    description: str | None
+
+    # The display name of the app
+    display_name: str
+
+    # A one-word descriptive release-type value that starts with a capital letter but is otherwise lowercase
+    release_type: str | None
+
+    # The string representation of the URL pointing to the app's icon
+    icon_url: str | None
+
+    # The string representation of the source of the app's icon
+    icon_source: str | None
+
+    # The name of the app used in URLs
+    name: str
+
+    # The OS the app will be running on
+    os: str
+
+    # The information about the app's owner
+    owner: Owner
+
+    # A unique and secret key used to identify the app in communication with the ingestion endpoint for crash reporting
+    # and analytics
+    app_secret: str
+
+    #
+    azure_subscription: AzureSubscriptionResponse | None
+
+    # The platform of the app
+    platform: str
+
+    # The creation origin of the app
+    origin: ReleaseOrigin
+
+    # The created date of this app
+    created_at: datetime.datetime | None
+
+    # The last updated date of this app
+    updated_at: datetime.datetime | None
+
+    # The permissions of the calling user
+    member_permissions: list[Permission]

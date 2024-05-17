@@ -39,7 +39,7 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
 
         self.log.info(f"Getting release counts for: {owner_name}/{app_name}")
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += "/analytics/distribution/release_counts"
 
         data = []

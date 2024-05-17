@@ -67,7 +67,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         self.log.info(f"Getting recent versions of app: {owner_name}/{app_name}")
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += "/recent_releases"
 
         response = self.get(request_url)
@@ -96,7 +96,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         self.log.info(f"Getting versions of app: {owner_name}/{app_name}")
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += "/releases?"
 
         parameters = {"published_only": str(published_only).lower()}
@@ -124,7 +124,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         self.log.info(f"Getting details for: {owner_name}/{app_name} - {release_id}")
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/releases/{release_id}?"
 
         response = self.get(request_url)
@@ -180,7 +180,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The App Center release identifier
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += "/uploads/releases"
 
         for attempt in range(3):
@@ -391,7 +391,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The App Center release end response
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/uploads/releases/{upload_id}"
 
         data = {"upload_status": "uploadFinished"}
@@ -422,7 +422,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :param str upload_id: The ID of the upload to wait for
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/uploads/releases/{upload_id}"
 
         def wait():
@@ -487,7 +487,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The App Center release identifier
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/releases/{release_id}/groups"
 
         data = {
@@ -530,7 +530,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The App Center release identifier
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/releases/{release_id}"
 
         for attempt in range(3):

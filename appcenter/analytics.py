@@ -51,6 +51,6 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
                 }
             )
 
-        response = self.post(request_url, data={"releases": data})
+        response = self.http_post(request_url, data={"releases": data})
 
         return deserialize.deserialize(ReleaseCounts, response.json())

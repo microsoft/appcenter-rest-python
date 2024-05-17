@@ -70,7 +70,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/recent_releases"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(list[BasicReleaseDetailsResponse], response.json())
 
@@ -106,7 +106,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         request_url += urllib.parse.urlencode(parameters)
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(list[BasicReleaseDetailsResponse], response.json())
 
@@ -127,7 +127,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/releases/{release_id}?"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(ReleaseDetailsResponse, response.json())
 
@@ -186,7 +186,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in get_upload_url")
             try:
-                response = self.post(request_url, data={})
+                response = self.http_post(request_url, data={})
                 if response.ok:
                     break
             except Exception as ex:
@@ -233,7 +233,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in set_upload_metadata")
             try:
-                response = self.post(request_url, data={})
+                response = self.http_post(request_url, data={})
                 if response.ok:
                     return deserialize.deserialize(SetUploadMetadataResponse, response.json())
             except Exception as ex:
@@ -272,7 +272,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in _upload_chunk")
             try:
-                response = self.post_raw_data(url=request_url, data=chunk)
+                response = self.http_post_raw_data(url=request_url, data=chunk)
                 if response.ok:
                     return deserialize.deserialize(ChunkUploadResponse, response.json())
             except Exception as ex:
@@ -306,7 +306,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in _mark_upload_finished")
             try:
-                response = self.post_raw_data(request_url, data=None)
+                response = self.http_post_raw_data(request_url, data=None)
                 if response.ok:
                     return deserialize.deserialize(UploadCompleteResponse, response.json())
             except Exception as ex:
@@ -399,7 +399,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting patch {attempt}/3 in commit_upload")
             try:
-                response = self.patch(request_url, data=data)
+                response = self.http_patch(request_url, data=data)
                 if response.ok:
                     break
             except Exception as ex:
@@ -431,7 +431,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         while True:
             self.log.info("Checking upload status...")
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             if not response.ok:
                 wait()
@@ -499,7 +499,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting post {attempt}/3 in release")
             try:
-                response = self.post(request_url, data=data)
+                response = self.http_post(request_url, data=data)
                 if response.ok:
                     break
             except Exception as ex:
@@ -536,7 +536,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         for attempt in range(3):
             self.log.debug(f"Attempting patch {attempt}/3 in update_release")
             try:
-                response = self.patch(request_url, data=release_update_request.json())
+                response = self.http_patch(request_url, data=release_update_request.json())
                 if response.ok:
                     break
             except Exception as ex:

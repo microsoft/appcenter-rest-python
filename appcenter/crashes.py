@@ -52,7 +52,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(ErrorGroup, response.json())
 
@@ -72,7 +72,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(HandledErrorDetails, response.json())
 
@@ -95,7 +95,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(dict[str, Any], response.json())
 
@@ -127,7 +127,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
             request_url += f"/errors/errorGroups/{error_group_id}"
 
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             group = deserialize.deserialize(ErrorGroup, response.json())
             state = group.state
@@ -135,7 +135,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
-        self.patch(request_url, data={"state": state.value, "annotation": annotation})
+        self.http_patch(request_url, data={"state": state.value, "annotation": annotation})
 
     # pylint: disable=too-many-arguments
     def get_error_groups(
@@ -205,7 +205,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             self.log.info(f"Fetching page {page} of crash groups")
 
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             error_groups = deserialize.deserialize(ErrorGroups, response.json())
 
@@ -272,7 +272,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             self.log.info(f"Fetching page {page} of crashes for group {error_group_id}")
 
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             errors = deserialize.deserialize(HandledErrors, response.json())
 
@@ -327,7 +327,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         if version:
             data["version"] = version
 
-        response = self.post(request_url, data=data)
+        response = self.http_post(request_url, data=data)
 
         return deserialize.deserialize(SymbolUploadBeginResponse, response.json())
 
@@ -348,7 +348,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         data = {"status": "committed"}
 
-        response = self.patch(request_url, data=data)
+        response = self.http_patch(request_url, data=data)
 
         return deserialize.deserialize(SymbolUploadEndRequest, response.json())
 

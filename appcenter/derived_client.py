@@ -185,7 +185,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def get(self, url: str) -> requests.Response:
+    def http_get(self, url: str) -> requests.Response:
         """Perform a GET request to a url
 
         :param url: The URL to run the GET on
@@ -207,7 +207,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def patch(self, url: str, *, data: Any) -> requests.Response:
+    def http_patch(self, url: str, *, data: Any) -> requests.Response:
         """Perform a PATCH request to a url
 
         :param url: The URL to run the POST on
@@ -229,7 +229,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post(self, url: str, *, data: Any) -> requests.Response:
+    def http_post(self, url: str, *, data: Any) -> requests.Response:
         """Perform a POST request to a url
 
         :param url: The URL to run the POST on
@@ -251,7 +251,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post_raw_data(self, url: str, data: Any) -> requests.Response:
+    def http_post_raw_data(self, url: str, data: Any) -> requests.Response:
         """Perform a POST request to a url
 
         :param url: The URL to run the POST on
@@ -273,7 +273,9 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post_files(self, url: str, *, files: dict[str, tuple[str, BinaryIO]]) -> requests.Response:
+    def http_post_files(
+        self, url: str, *, files: dict[str, tuple[str, BinaryIO]]
+    ) -> requests.Response:
         """Perform a POST request to a url, sending files
 
         :param url: The URL to run the POST on
@@ -298,7 +300,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def delete(self, url: str) -> requests.Response:
+    def http_delete(self, url: str) -> requests.Response:
         """Perform a DELETE request to a url
 
         :param url: The URL to run the DELETE on

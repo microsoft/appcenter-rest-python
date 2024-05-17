@@ -56,18 +56,18 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("versions", token, parent_logger)
 
-    def recent(self, *, owner_name: str, app_name: str) -> list[BasicReleaseDetailsResponse]:
+    def recent(self, *, org_name: str, app_name: str) -> list[BasicReleaseDetailsResponse]:
         """Get the recent version for each distribution group.
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
 
         :returns: A list of BasicReleaseDetailsResponse
         """
 
-        self.log.info(f"Getting recent versions of app: {owner_name}/{app_name}")
+        self.log.info(f"Getting recent versions of app: {org_name}/{app_name}")
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/recent_releases"
 
         response = self.get(request_url)
@@ -77,14 +77,14 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def all(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         published_only: bool = False,
         scope: str | None = None,
     ) -> Iterator[BasicReleaseDetailsResponse]:
         """Get all (the 100 latest) versions.
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param bool published_only: Return only the published releases (defaults to false)
         :param str | None scope: When the scope is 'tester', only includes
@@ -94,9 +94,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: An iterator of BasicReleaseDetailsResponse
         """
 
-        self.log.info(f"Getting versions of app: {owner_name}/{app_name}")
+        self.log.info(f"Getting versions of app: {org_name}/{app_name}")
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/releases?"
 
         parameters = {"published_only": str(published_only).lower()}
@@ -111,56 +111,56 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return deserialize.deserialize(list[BasicReleaseDetailsResponse], response.json())
 
     def release_details(
-        self, *, owner_name: str, app_name: str, release_id: int
+        self, *, org_name: str, app_name: str, release_id: int
     ) -> ReleaseDetailsResponse:
         """Get the full release details for a given version.
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param int release_id: The ID of the release to get the details for
 
         :returns: The full details for a release
         """
 
-        self.log.info(f"Getting details for: {owner_name}/{app_name} - {release_id}")
+        self.log.info(f"Getting details for: {org_name}/{app_name} - {release_id}")
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/releases/{release_id}?"
 
         response = self.get(request_url)
 
         return deserialize.deserialize(ReleaseDetailsResponse, response.json())
 
-    def release_id_for_version(self, *, owner_name: str, app_name: str, version: str) -> int | None:
+    def release_id_for_version(self, *, org_name: str, app_name: str, version: str) -> int | None:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param bool version: The app version (usually build number)
 
         :returns: The App Center release identifier
         """
 
-        for app_version in self.all(owner_name=owner_name, app_name=app_name):
+        for app_version in self.all(org_name=org_name, app_name=app_name):
             if app_version.version == version:
                 return app_version.identifier
 
         return None
 
-    def latest_commit(self, *, owner_name: str, app_name: str) -> str | None:
+    def latest_commit(self, *, org_name: str, app_name: str) -> str | None:
         """Find the most recent release which has an available commit in it and return the commit hash.
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
 
         :returns: The latest commit available on App Center
         """
 
-        self.log.info(f"Getting latest commit for app: {owner_name}/{app_name}")
+        self.log.info(f"Getting latest commit for app: {org_name}/{app_name}")
 
-        for version in self.all(owner_name=owner_name, app_name=app_name):
+        for version in self.all(org_name=org_name, app_name=app_name):
             full_details = self.release_details(
-                owner_name=owner_name, app_name=app_name, release_id=version.identifier
+                org_name=org_name, app_name=app_name, release_id=version.identifier
             )
 
             if full_details.build is None:
@@ -171,16 +171,16 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
 
         return None
 
-    def get_upload_url(self, *, owner_name: str, app_name: str) -> CreateReleaseUploadResponse:
+    def get_upload_url(self, *, org_name: str, app_name: str) -> CreateReleaseUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
 
         :returns: The App Center release identifier
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/uploads/releases"
 
         for attempt in range(3):
@@ -380,18 +380,18 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return True
 
     def commit_upload(
-        self, *, owner_name: str, app_name: str, upload_id: str
+        self, *, org_name: str, app_name: str, upload_id: str
     ) -> CommitUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param str upload_id: The ID of the upload to commit
 
         :returns: The App Center release end response
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/uploads/releases/{upload_id}"
 
         data = {"upload_status": "uploadFinished"}
@@ -413,16 +413,16 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         return deserialize.deserialize(CommitUploadResponse, response.json())
 
     def _wait_for_upload(
-        self, *, owner_name: str, app_name: str, upload_id: str
+        self, *, org_name: str, app_name: str, upload_id: str
     ) -> CommitUploadResponse:
         """Wait for an upload to finish processing
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param str upload_id: The ID of the upload to wait for
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/uploads/releases/{upload_id}"
 
         def wait():
@@ -468,7 +468,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def release(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         release_id: int,
         group_id: str,
@@ -477,7 +477,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> ReleaseDestinationResponse:
         """Release a build to a group.
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param int release_id: The release ID of the app
         :param str group_id: The release ID of the group to release to
@@ -487,7 +487,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The App Center release identifier
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/releases/{release_id}/groups"
 
         data = {
@@ -515,14 +515,14 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def update_release(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         release_id: int,
         release_update_request: ReleaseUpdateRequest,
     ) -> None:
         """Update a release with new details
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param int release_id: The release ID of the app
         :param ReleaseUpdateRequest release_update_request: The release ID of the group to release to
@@ -530,7 +530,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         :returns: The App Center release identifier
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/releases/{release_id}"
 
         for attempt in range(3):
@@ -550,7 +550,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def upload_build(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         binary_path: str,
         release_notes: str,
@@ -560,7 +560,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> int | None:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param str binary_path: The path to the binary to upload
         :param str release_notes: The release notes for the release
@@ -577,9 +577,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         if not os.path.exists(binary_path):
             raise FileNotFoundError(f"Could not find binary: {binary_path}")
 
-        create_release_upload_response = self.get_upload_url(
-            owner_name=owner_name, app_name=app_name
-        )
+        create_release_upload_response = self.get_upload_url(org_name=org_name, app_name=app_name)
 
         success = self.upload_binary(
             create_release_upload_response=create_release_upload_response,
@@ -590,13 +588,13 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             raise Exception("Failed to upload binary")
 
         self.commit_upload(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             upload_id=create_release_upload_response.identifier,
         )
 
         upload_end_response = self._wait_for_upload(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             upload_id=create_release_upload_response.identifier,
         )
@@ -612,7 +610,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         update_request = ReleaseUpdateRequest(release_notes=release_notes, build=build_info)
 
         self.update_release(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             release_id=upload_end_response.release_distinct_id,
             release_update_request=update_request,
@@ -624,7 +622,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def upload_and_release(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         binary_path: str,
         group_id: str,
@@ -636,7 +634,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> ReleaseDetailsResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str owner_name: The name of the app account owner
+        :param str org_name: The name of the organization
         :param str app_name: The name of the app
         :param str binary_path: The path to the binary to upload
         :param str group_id: The ID of the group to release to
@@ -653,7 +651,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         """
 
         release_id = self.upload_build(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             binary_path=binary_path,
             release_notes=release_notes,
@@ -666,13 +664,13 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             raise Exception("Did not get release ID after upload")
 
         self.release(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             release_id=release_id,
             group_id=group_id,
             notify_testers=notify_testers if notify_testers else False,
         )
 
-        return self.release_details(owner_name=owner_name, app_name=app_name, release_id=release_id)
+        return self.release_details(org_name=org_name, app_name=app_name, release_id=release_id)
 
     # pylint: enable=too-many-arguments

@@ -30,9 +30,9 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
     ) -> ReleaseCounts:
         """Get the release counts for an app
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param list[ReleaseWithDistributionGroup] releases: The list of releases to get the counts for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param releases: The list of releases to get the counts for
 
         :returns: The release counts
         """

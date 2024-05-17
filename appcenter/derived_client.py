@@ -142,7 +142,7 @@ class AppCenterDerivedClient:
     def base_url(self, *, version: str = "0.1") -> str:
         """Generate the base URL for the API.
 
-        :param str version: The API version to hit
+        :param version: The API version to hit
 
         :returns: The base URL
         """
@@ -151,9 +151,9 @@ class AppCenterDerivedClient:
     def generate_app_url(self, *, version: str = "0.1", org_name: str, app_name: str) -> str:
         """Generate a URL to use for querying the API for app info.
 
-        :param str version: The API version to hit
-        :param str org_name: The name of the org
-        :param str app_name: The name of the app
+        :param version: The API version to hit
+        :param org_name: The name of the org
+        :param app_name: The name of the app
 
         :returns: A generated URL base
         """
@@ -165,8 +165,8 @@ class AppCenterDerivedClient:
     def generate_org_url(self, *, version: str = "0.1", org_name: str) -> str:
         """Generate a URL to use for querying the API for org info.
 
-        :param str version: The API version to hit
-        :param str org_name: The name of the org
+        :param version: The API version to hit
+        :param org_name: The name of the org
 
         :returns: A generated URL base
         """

@@ -42,9 +42,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def group_details(self, *, org_name: str, app_name: str, error_group_id: str) -> ErrorGroup:
         """Get the error group details.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to get the details for
 
         :returns: An ErrorGroup
         """
@@ -61,10 +61,10 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> HandledErrorDetails:
         """Get the error details.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to get the details for
-        :param str error_id: The ID of the error to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to get the details for
+        :param error_id: The ID of the error to get the details for
 
         :returns: A HandledErrorDetails
         """
@@ -84,10 +84,10 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         This is the full details that App Center has on a crash. It is not
         parsed due to being different per platform.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to get the details for
-        :param str error_id: The ID of the error to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to get the details for
+        :param error_id: The ID of the error to get the details for
 
         :returns: The raw full error info dictionary
         """
@@ -110,11 +110,11 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> None:
         """Get the error group details.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to set the annotation on
-        :param str annotation: The annotation text
-        :param ErrorGroupState | None state: The state to set the error group to
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to set the annotation on
+        :param annotation: The annotation text
+        :param state: The state to set the error group to
 
         The `state` parameter here does seem somewhat unusual, but it can't be
         helped unfortunately. The API requires that we set the state with the
@@ -154,16 +154,16 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> Iterator[ErrorGroupListItem]:
         """Get the error groups for an app.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param datetime.datetime start_time: The time to start getting error groups from
-        :param datetime.datetime | None end_time: The end time to get error groups from
-        :param str | None version: The version of the app to restrict the search to (if any)
-        :param str | None app_build: The build to restrict the search to (if any)
-        :param ErrorGroupState | None group_state: Set to filter to just this group state (open, closed, ignored)
-        :param str | None error_type: Set to filter to specific types of error (all, unhandledError, handledError)
-        :param str | None order_by: The order by parameter to pass in (this will be encoded for you)
-        :param str | None limit: The max number of results to return per request (should not go past 100)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param start_time: The time to start getting error groups from
+        :param end_time: The end time to get error groups from
+        :param version: The version of the app to restrict the search to (if any)
+        :param app_build: The build to restrict the search to (if any)
+        :param group_state: Set to filter to just this group state (open, closed, ignored)
+        :param error_type: Set to filter to specific types of error (all, unhandledError, handledError)
+        :param order_by: The order by parameter to pass in (this will be encoded for you)
+        :param limit: The max number of results to return per request (should not go past 100)
 
         :returns: An iterator of ErrorGroupListItem
         """
@@ -235,13 +235,13 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> Iterator[HandledError]:
         """Get the errors in a group.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the group to get the errors from
-        :param datetime.datetime | None start_time: The time to start getting error groups from
-        :param datetime.datetime | None end_time: The end time to get error groups from
-        :param str | None model: The device model to restrict the search to (if any)
-        :param str | None operating_system: The OS to restrict the search to (if any)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the group to get the errors from
+        :param start_time: The time to start getting error groups from
+        :param end_time: The end time to get error groups from
+        :param model: The device model to restrict the search to (if any)
+        :param operating_system: The OS to restrict the search to (if any)
 
         :returns: An iterator of HandledError
         """
@@ -297,12 +297,12 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> SymbolUploadBeginResponse:
         """Upload debug symbols
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str symbols_path: The path to the symbols
-        :param str symbol_type: The type of symbols being uploaded
-        :param str | None build_number: The build number (required for Android)
-        :param str | None version: The build version (required for Android)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param symbols_path: The path to the symbols
+        :param symbol_type: The type of symbols being uploaded
+        :param build_number: The build number (required for Android)
+        :param version: The build version (required for Android)
 
         :raises ValueError: If the build number or version aren't specified and it's an Android upload
 
@@ -336,9 +336,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> SymbolUploadEndRequest:
         """Commit a symbol upload operation
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str upload_id: The ID of the symbols upload to commit
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param upload_id: The ID of the symbols upload to commit
 
         :returns: The App Center symbol upload end response
         """
@@ -367,14 +367,14 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> None:
         """Upload debug symbols
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str symbols_path: The path to the symbols
-        :param str symbols_name: The name to use for the symbols (defaults to file basename)
-        :param str symbol_type: The type of symbols being uploaded
-        :param str | None build_number: The build number (required for Android)
-        :param str | None version: The build version (required for Android)
-        :param ProgressCallback | None progress_callback: The upload progress callback
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param symbols_path: The path to the symbols
+        :param symbols_name: The name to use for the symbols (defaults to file basename)
+        :param symbol_type: The type of symbols being uploaded
+        :param build_number: The build number (required for Android)
+        :param version: The build version (required for Android)
+        :param progress_callback: The upload progress callback
 
         For the upload progress callback, this is a callable where the first
         parameter is the number of bytes uploaded, and the second parameter is
@@ -424,9 +424,9 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def _next_link_polished(self, next_link: str, org_name: str, app_name: str) -> str:
         """Polish nextLink string gotten from AppCenter service
 
-        :param str next_link: The nextLink property from a service response when items are queried in batches
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
+        :param next_link: The nextLink property from a service response when items are queried in batches
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
 
         :returns: A polished next link to use on next batch
         """

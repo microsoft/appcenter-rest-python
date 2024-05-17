@@ -70,7 +70,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
     def teams(self, *, org_name: str) -> list[TeamResponse]:
         """Get the teams in an org.
 
-        :param str org_name: The name of the organization
+        :param org_name: The name of the organization
 
         :returns: A TeamResponse
         """
@@ -85,8 +85,8 @@ class AppCenterAccountClient(AppCenterDerivedClient):
     def team_users(self, *, org_name: str, team_name: str) -> list[OrganizationUserResponse]:
         """Get the users in a team in an org.
 
-        :param str org_name: The name of the organization
-        :param str team_name: The name of the team
+        :param org_name: The name of the organization
+        :param team_name: The name of the team
 
         :returns: A TeamResponse
         """
@@ -111,10 +111,10 @@ class AppCenterAccountClient(AppCenterDerivedClient):
         If they are a new collaborator, they will be invited. If that is the
         case, the role must be specified.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str user_email: The email of the user
-        :param Role | None role: The role the user should have (this is required for new users)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param user_email: The email of the user
+        :param role: The role the user should have (this is required for new users)
 
         :returns: The list of users
         """
@@ -134,9 +134,9 @@ class AppCenterAccountClient(AppCenterDerivedClient):
     def delete_collaborator(self, *, org_name: str, app_name: str, user_email: str) -> None:
         """Remove a user as a collaborator from an app.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str user_email: The email of the user to remove
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param user_email: The email of the user to remove
         """
 
         self.log.info(f"Deleting user {user_email} from: {org_name}/{app_name}")
@@ -151,10 +151,10 @@ class AppCenterAccountClient(AppCenterDerivedClient):
     ) -> None:
         """Set a users collaborator permissions on an app.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str user_email: The email of the user
-        :param Permission permission: The permission level to grant
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param user_email: The email of the user
+        :param permission: The permission level to grant
 
         :returns: The list of users
         """
@@ -172,7 +172,7 @@ class AppCenterAccountClient(AppCenterDerivedClient):
     def apps(self, *, org_name: str) -> list[AppResponse]:
         """Get the apps in an org.
 
-        :param str org_name: The name of the organization
+        :param org_name: The name of the organization
 
         :returns: A list of AppResponse
         """

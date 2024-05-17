@@ -17,7 +17,7 @@ from appcenter.versions import AppCenterVersionsClient
 class AppCenterClient:
     """Class responsible for getting data from App Center through REST calls.
 
-    :param str access_token: The access token to use for authentication. Leave as None to use KeyVault
+    :param access_token: The access token to use for authentication. Leave as None to use KeyVault
     """
 
     log: logging.Logger

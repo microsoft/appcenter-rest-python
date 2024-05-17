@@ -59,8 +59,8 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def recent(self, *, org_name: str, app_name: str) -> list[BasicReleaseDetailsResponse]:
         """Get the recent version for each distribution group.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
 
         :returns: A list of BasicReleaseDetailsResponse
         """
@@ -84,10 +84,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> Iterator[BasicReleaseDetailsResponse]:
         """Get all (the 100 latest) versions.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param bool published_only: Return only the published releases (defaults to false)
-        :param str | None scope: When the scope is 'tester', only includes
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param published_only: Return only the published releases (defaults to false)
+        :param scope: When the scope is 'tester', only includes
                                     releases that have been distributed to
                                     groups that the user belongs to.
 
@@ -115,9 +115,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> ReleaseDetailsResponse:
         """Get the full release details for a given version.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param int release_id: The ID of the release to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param release_id: The ID of the release to get the details for
 
         :returns: The full details for a release
         """
@@ -134,9 +134,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def release_id_for_version(self, *, org_name: str, app_name: str, version: str) -> int | None:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param bool version: The app version (usually build number)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param version: The app version (usually build number)
 
         :returns: The App Center release identifier
         """
@@ -150,8 +150,8 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def latest_commit(self, *, org_name: str, app_name: str) -> str | None:
         """Find the most recent release which has an available commit in it and return the commit hash.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
 
         :returns: The latest commit available on App Center
         """
@@ -174,8 +174,8 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     def get_upload_url(self, *, org_name: str, app_name: str) -> CreateReleaseUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
 
         :returns: The App Center release identifier
         """
@@ -207,7 +207,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> SetUploadMetadataResponse | None:
         """Set the metadata for a binary upload
 
-        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        :param create_release_upload_response: The response to a `get_upload_url` call
         :param binary_path: The path to the binary to upload
 
         :returns: The upload response if we manage to get one, None otherwise
@@ -255,7 +255,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> SetUploadMetadataResponse | None:
         """Set the metadata for a binary upload
 
-        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        :param create_release_upload_response: The response to a `get_upload_url` call
         :param binary_path: The path to the binary to upload
 
         :returns: The upload response if we manage to get one, None otherwise
@@ -290,7 +290,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> UploadCompleteResponse | None:
         """Mark the upload of a binary as finished
 
-        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        :param create_release_upload_response: The response to a `get_upload_url` call
 
         :returns: The upload complete response on success, None otherwise.
         """
@@ -327,7 +327,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> bool:
         """Upload a binary
 
-        :param CreateReleaseUploadResponse create_release_upload_response: The response to a `get_upload_url` call
+        :param create_release_upload_response: The response to a `get_upload_url` call
         :param binary_path: The path to the binary to upload
 
         :returns: True on success, False on failure
@@ -384,9 +384,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> CommitUploadResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str upload_id: The ID of the upload to commit
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param upload_id: The ID of the upload to commit
 
         :returns: The App Center release end response
         """
@@ -417,9 +417,9 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> CommitUploadResponse:
         """Wait for an upload to finish processing
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str upload_id: The ID of the upload to wait for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param upload_id: The ID of the upload to wait for
         """
 
         request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
@@ -477,12 +477,12 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> ReleaseDestinationResponse:
         """Release a build to a group.
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param int release_id: The release ID of the app
-        :param str group_id: The release ID of the group to release to
-        :param bool mandatory_update: Set to True to make this a mandatory update
-        :param bool notify_testers: Set to True to notify testers about this new build
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param release_id: The release ID of the app
+        :param group_id: The release ID of the group to release to
+        :param mandatory_update: Set to True to make this a mandatory update
+        :param notify_testers: Set to True to notify testers about this new build
 
         :returns: The App Center release identifier
         """
@@ -522,10 +522,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> None:
         """Update a release with new details
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param int release_id: The release ID of the app
-        :param ReleaseUpdateRequest release_update_request: The release ID of the group to release to
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param release_id: The release ID of the app
+        :param release_update_request: The release ID of the group to release to
 
         :returns: The App Center release identifier
         """
@@ -560,13 +560,13 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> int | None:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str binary_path: The path to the binary to upload
-        :param str release_notes: The release notes for the release
-        :param str | None branch_name: The git branch that the build came from
-        :param str | None commit_hash: The hash of the commit that was just built
-        :param str | None commit_message: The message of the commit that was just built
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param binary_path: The path to the binary to upload
+        :param release_notes: The release notes for the release
+        :param branch_name: The git branch that the build came from
+        :param commit_hash: The hash of the commit that was just built
+        :param commit_message: The message of the commit that was just built
 
         :raises FileNotFoundError: If the supplied binary is not found
         :raises Exception: If we don't get a release ID back after upload
@@ -634,15 +634,15 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
     ) -> ReleaseDetailsResponse:
         """Get the App Center release identifier for the app version (usually build number).
 
-        :param str org_name: The name of the organization
-        :param str app_name: The name of the app
-        :param str binary_path: The path to the binary to upload
-        :param str group_id: The ID of the group to release to
-        :param str release_notes: The release notes for the release
-        :param bool | None notify_testers: Set to True to notify testers about this build
-        :param str | None branch_name: The git branch that the build came from
-        :param str | None commit_hash: The hash of the commit that was just built
-        :param str | None commit_message: The message of the commit that was just built
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param binary_path: The path to the binary to upload
+        :param group_id: The ID of the group to release to
+        :param release_notes: The release notes for the release
+        :param notify_testers: Set to True to notify testers about this build
+        :param branch_name: The git branch that the build came from
+        :param commit_hash: The hash of the commit that was just built
+        :param commit_message: The message of the commit that was just built
 
         :raises FileNotFoundError: If the supplied binary is not found
         :raises Exception: If we don't get a release ID back after upload

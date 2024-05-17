@@ -147,7 +147,7 @@ class HandledErrorDetails:
     appLaunchTimestamp: datetime.datetime | None
     carrierName: str | None
     jailbreak: bool | None
-    properties: dict[str, str | None]
+    properties: dict[str, str] | None
 
 
 class ReleaseOrigin(enum.Enum):
@@ -286,7 +286,7 @@ class ReleaseDetailsResponse:
     bundle_identifier: str | None
 
     # Hashes for the packages
-    package_hashes: list[str | None]
+    package_hashes: list[str] | None
 
     # MD5 checksum of the release binary.
     fingerprint: str | None
@@ -582,6 +582,24 @@ class TeamResponse:
 
     # The description of the team
     description: str | None
+
+
+@deserialize.key("identifier", "id")
+class AppTeamResponse:
+    # The unique ID of the team
+    identifier: str
+
+    # The name of the team
+    name: str
+
+    # The display name of the team
+    display_name: str
+
+    # The description of the team
+    description: str | None
+
+    # The permissions the team has
+    permissions: list[Permission]
 
 
 class OwnerType(enum.Enum):

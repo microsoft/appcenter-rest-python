@@ -310,7 +310,7 @@ def test_annotations(org_name: str, app_name: str, token: str):
 def test_users(org_name: str, app_name: str, token: str):
     """Test construction."""
     client = appcenter.AppCenterClient(access_token=token)
-    users = client.account.users(org_name=org_name, app_name=app_name)
+    users = client.apps.users(org_name=org_name, app_name=app_name)
 
     assert len(users) > 0
 
@@ -369,21 +369,30 @@ def test_create_delete_tokens(token: str):
 def test_get_teams(org_name: str, token: str):
     """Test get teams"""
     client = appcenter.AppCenterClient(access_token=token)
-    teams = client.account.teams(org_name=org_name)
+    teams = client.orgs.teams.get(org_name=org_name)
     assert len(teams) != 0
 
 
 def test_get_team_users(org_name: str, token: str):
     """Test get teams"""
     client = appcenter.AppCenterClient(access_token=token)
-    teams = client.account.teams(org_name=org_name)
+    teams = client.orgs.teams.get(org_name=org_name)
     team = teams[0]
-    users = client.account.team_users(org_name=org_name, team_name=team.name)
+    users = client.orgs.teams.users(org_name=org_name, team_name=team.name)
     assert len(users) != 0
 
 
 def test_get_apps(org_name: str, token: str):
     """Test get apps"""
     client = appcenter.AppCenterClient(access_token=token)
-    apps = client.account.apps(org_name=org_name)
+    apps = client.orgs.apps(org_name=org_name)
     assert len(apps) != 0
+
+
+def test_get_apps_teams(org_name: str, token: str):
+    """Test get apps"""
+    client = appcenter.AppCenterClient(access_token=token)
+    apps = client.orgs.apps(org_name=org_name)
+    assert len(apps) != 0
+    teams = client.apps.teams(org_name=org_name, app_name=apps[0].name)
+    assert len(teams) != 0

@@ -30,7 +30,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-azure-storage-blob = "^2.1.0"
+azure-storage-blob = ">=2.1,<13.0"
 deserialize = "^2.0.1"
 requests = "^2.31.0"
 tenacity = "^8.2.2"

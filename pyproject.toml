@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "appcenter"
-version = "4.0.1"
+version = "4.0.2"
 description = "A Python wrapper around the App Center REST API."
 
 license = "MIT"

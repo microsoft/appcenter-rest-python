@@ -410,6 +410,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
                 blob_name,
                 symbols_file,
                 BlobType.BLOCKBLOB,
+                overwrite=True,
                 progress_hook=progress_callback,
             )
 

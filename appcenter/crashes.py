@@ -49,7 +49,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: An ErrorGroup
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
         response = self.get(request_url)
@@ -69,7 +69,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: A HandledErrorDetails
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}"
 
         response = self.get(request_url)
@@ -92,7 +92,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: The raw full error info dictionary
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
 
         response = self.get(request_url)
@@ -124,7 +124,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         """
 
         if state is None:
-            request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+            request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
             request_url += f"/errors/errorGroups/{error_group_id}"
 
             response = self.get(request_url)
@@ -132,7 +132,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             group = deserialize.deserialize(ErrorGroup, response.json())
             state = group.state
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
         self.patch(request_url, data={"state": state.value, "annotation": annotation})
@@ -170,7 +170,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         # pylint: disable=too-many-locals
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += "/errors/errorGroups?"
 
         parameters = {"start": start_time.replace(microsecond=0).isoformat()}
@@ -246,7 +246,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: An iterator of HandledError
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors?"
 
         parameters: dict[str, str] = {}
@@ -316,7 +316,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             if version is None:
                 raise ValueError("The version is required for Android")
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += "/symbol_uploads"
 
         data = {"symbol_type": symbol_type.value, "file_name": symbols_name}
@@ -343,7 +343,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         :returns: The App Center symbol upload end response
         """
 
-        request_url = self.generate_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
         request_url += f"/symbol_uploads/{upload_id}"
 
         data = {"status": "committed"}

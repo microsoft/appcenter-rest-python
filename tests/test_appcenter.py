@@ -282,7 +282,7 @@ def test_annotations(owner_name: str, app_name: str, token: str):
     for result in client.crashes.get_error_groups(
         owner_name=owner_name,
         app_name=app_name,
-        start_time=datetime.datetime.now() - datetime.timedelta(days=60),
+        start_time=datetime.datetime.now() - datetime.timedelta(days=14),
         order_by="count desc",
         limit=1,
     ):
@@ -316,25 +316,26 @@ def test_users(owner_name: str, app_name: str, token: str):
 
     testers = list(
         filter(
-            lambda user: user.permissions[0] == appcenter.models.Permission.TESTER,
+            lambda user: user.permissions[0] == appcenter.models.Permission.TESTER,  # type:ignore
             users,
         )
     )
     viewers = list(
         filter(
-            lambda user: user.permissions[0] == appcenter.models.Permission.VIEWER,
+            lambda user: user.permissions[0] == appcenter.models.Permission.VIEWER,  # type:ignore
             users,
         )
     )
     developers = list(
         filter(
-            lambda user: user.permissions[0] == appcenter.models.Permission.DEVELOPER,
+            lambda user: user.permissions[0]  # type:ignore
+            == appcenter.models.Permission.DEVELOPER,
             users,
         )
     )
     managers = list(
         filter(
-            lambda user: user.permissions[0] == appcenter.models.Permission.MANAGER,
+            lambda user: user.permissions[0] == appcenter.models.Permission.MANAGER,  # type:ignore
             users,
         )
     )
@@ -363,3 +364,26 @@ def test_create_delete_tokens(token: str):
     )
     assert new_token.description == name
     client.tokens.delete_user_token(new_token)
+
+
+def test_get_teams(owner_name: str, token: str):
+    """Test get teams"""
+    client = appcenter.AppCenterClient(access_token=token)
+    teams = client.account.teams(owner_name=owner_name)
+    assert len(teams) != 0
+
+
+def test_get_team_users(owner_name: str, token: str):
+    """Test get teams"""
+    client = appcenter.AppCenterClient(access_token=token)
+    teams = client.account.teams(owner_name=owner_name)
+    team = teams[0]
+    users = client.account.team_users(owner_name=owner_name, team_name=team.name)
+    assert len(users) != 0
+
+
+def test_get_apps(owner_name: str, token: str):
+    """Test get apps"""
+    client = appcenter.AppCenterClient(access_token=token)
+    apps = client.account.apps(owner_name=owner_name)
+    assert len(apps) != 0

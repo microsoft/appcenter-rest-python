@@ -148,8 +148,8 @@ class AppCenterDerivedClient:
         """
         return f"{API_BASE_URL}/v{version}"
 
-    def generate_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
-        """Generate a URL to use for querying the API.
+    def generate_app_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
+        """Generate a URL to use for querying the API for app info.
 
         :param str version: The API version to hit
         :param str owner_name: The name of the owner of the app
@@ -159,6 +159,19 @@ class AppCenterDerivedClient:
         """
 
         url = self.base_url(version=version) + f"/apps/{owner_name}/{app_name}"
+        self.log.debug(f"Generated URL: {url}")
+        return url
+
+    def generate_org_url(self, *, version: str = "0.1", owner_name: str) -> str:
+        """Generate a URL to use for querying the API for org info.
+
+        :param str version: The API version to hit
+        :param str owner_name: The name of the org owner
+
+        :returns: A generated URL base
+        """
+
+        url = self.base_url(version=version) + f"/orgs/{owner_name}"
         self.log.debug(f"Generated URL: {url}")
         return url
 

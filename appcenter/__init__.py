@@ -14,6 +14,8 @@ from appcenter.orgs import AppCenterOrgsClient
 from appcenter.tokens import AppCenterTokensClient
 from appcenter.versions import AppCenterVersionsClient
 
+# pylint: disable=too-many-instance-attributes
+
 
 class AppCenterClient:
     """Class responsible for getting data from App Center through REST calls.
@@ -46,3 +48,6 @@ class AppCenterClient:
         self.orgs = AppCenterOrgsClient(self.token, self.log)
         self.tokens = AppCenterTokensClient(self.token, self.log)
         self.versions = AppCenterVersionsClient(self.token, self.log)
+
+
+# pylint: enable=too-many-instance-attributes

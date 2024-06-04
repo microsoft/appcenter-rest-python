@@ -33,7 +33,7 @@ azure-storage-blob = "^12.13.0"
 deserialize = "^2.0.1"
 requests = "^2.32.0"
 tenacity = "^8.2.2"
-types-requests = "^2.32.0.2"
+types-requests = "^2.32.0.20240602"
 
 [tool.poetry.dev-dependencies]
 black = "24.4.2"

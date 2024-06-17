@@ -39,70 +39,70 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def __init__(self, token: str, parent_logger: logging.Logger) -> None:
         super().__init__("crashes", token, parent_logger)
 
-    def group_details(self, *, owner_name: str, app_name: str, error_group_id: str) -> ErrorGroup:
+    def group_details(self, *, org_name: str, app_name: str, error_group_id: str) -> ErrorGroup:
         """Get the error group details.
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to get the details for
 
         :returns: An ErrorGroup
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(ErrorGroup, response.json())
 
     def error_details(
-        self, *, owner_name: str, app_name: str, error_group_id: str, error_id: str
+        self, *, org_name: str, app_name: str, error_group_id: str, error_id: str
     ) -> HandledErrorDetails:
         """Get the error details.
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to get the details for
-        :param str error_id: The ID of the error to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to get the details for
+        :param error_id: The ID of the error to get the details for
 
         :returns: A HandledErrorDetails
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(HandledErrorDetails, response.json())
 
     def error_info_dictionary(
-        self, *, owner_name: str, app_name: str, error_group_id: str, error_id: str
+        self, *, org_name: str, app_name: str, error_group_id: str, error_id: str
     ) -> HandledErrorDetails:
         """Get the full error info dictionary.
 
         This is the full details that App Center has on a crash. It is not
         parsed due to being different per platform.
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to get the details for
-        :param str error_id: The ID of the error to get the details for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to get the details for
+        :param error_id: The ID of the error to get the details for
 
         :returns: The raw full error info dictionary
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors/{error_id}/download"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(dict[str, Any], response.json())
 
     def set_annotation(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         error_group_id: str,
         annotation: str,
@@ -110,11 +110,11 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> None:
         """Get the error group details.
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the error group to set the annotation on
-        :param str annotation: The annotation text
-        :param ErrorGroupState | None state: The state to set the error group to
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the error group to set the annotation on
+        :param annotation: The annotation text
+        :param state: The state to set the error group to
 
         The `state` parameter here does seem somewhat unusual, but it can't be
         helped unfortunately. The API requires that we set the state with the
@@ -124,24 +124,24 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         """
 
         if state is None:
-            request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+            request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
             request_url += f"/errors/errorGroups/{error_group_id}"
 
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             group = deserialize.deserialize(ErrorGroup, response.json())
             state = group.state
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}"
 
-        self.patch(request_url, data={"state": state.value, "annotation": annotation})
+        self.http_patch(request_url, data={"state": state.value, "annotation": annotation})
 
     # pylint: disable=too-many-arguments
     def get_error_groups(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         start_time: datetime.datetime,
         end_time: datetime.datetime | None = None,
@@ -154,23 +154,23 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> Iterator[ErrorGroupListItem]:
         """Get the error groups for an app.
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param datetime.datetime start_time: The time to start getting error groups from
-        :param datetime.datetime | None end_time: The end time to get error groups from
-        :param str | None version: The version of the app to restrict the search to (if any)
-        :param str | None app_build: The build to restrict the search to (if any)
-        :param ErrorGroupState | None group_state: Set to filter to just this group state (open, closed, ignored)
-        :param str | None error_type: Set to filter to specific types of error (all, unhandledError, handledError)
-        :param str | None order_by: The order by parameter to pass in (this will be encoded for you)
-        :param str | None limit: The max number of results to return per request (should not go past 100)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param start_time: The time to start getting error groups from
+        :param end_time: The end time to get error groups from
+        :param version: The version of the app to restrict the search to (if any)
+        :param app_build: The build to restrict the search to (if any)
+        :param group_state: Set to filter to just this group state (open, closed, ignored)
+        :param error_type: Set to filter to specific types of error (all, unhandledError, handledError)
+        :param order_by: The order by parameter to pass in (this will be encoded for you)
+        :param limit: The max number of results to return per request (should not go past 100)
 
         :returns: An iterator of ErrorGroupListItem
         """
 
         # pylint: disable=too-many-locals
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/errors/errorGroups?"
 
         parameters = {"start": start_time.replace(microsecond=0).isoformat()}
@@ -205,7 +205,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             self.log.info(f"Fetching page {page} of crash groups")
 
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             error_groups = deserialize.deserialize(ErrorGroups, response.json())
 
@@ -215,7 +215,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
                 break
 
             request_url = appcenter.constants.API_BASE_URL + self._next_link_polished(
-                error_groups.nextLink, owner_name, app_name
+                error_groups.nextLink, org_name, app_name
             )
 
         # pylint: disable=too-many-locals
@@ -225,7 +225,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def errors_in_group(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         error_group_id: str,
         start_time: datetime.datetime | None = None,
@@ -235,18 +235,18 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> Iterator[HandledError]:
         """Get the errors in a group.
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str error_group_id: The ID of the group to get the errors from
-        :param datetime.datetime | None start_time: The time to start getting error groups from
-        :param datetime.datetime | None end_time: The end time to get error groups from
-        :param str | None model: The device model to restrict the search to (if any)
-        :param str | None operating_system: The OS to restrict the search to (if any)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param error_group_id: The ID of the group to get the errors from
+        :param start_time: The time to start getting error groups from
+        :param end_time: The end time to get error groups from
+        :param model: The device model to restrict the search to (if any)
+        :param operating_system: The OS to restrict the search to (if any)
 
         :returns: An iterator of HandledError
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/errors/errorGroups/{error_group_id}/errors?"
 
         parameters: dict[str, str] = {}
@@ -272,7 +272,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             self.log.info(f"Fetching page {page} of crashes for group {error_group_id}")
 
-            response = self.get(request_url)
+            response = self.http_get(request_url)
 
             errors = deserialize.deserialize(HandledErrors, response.json())
 
@@ -282,13 +282,13 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
                 break
 
             request_url = appcenter.constants.API_BASE_URL + self._next_link_polished(
-                errors.nextLink, owner_name, app_name
+                errors.nextLink, org_name, app_name
             )
 
     def begin_symbol_upload(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         symbols_name: str,
         symbol_type: SymbolType,
@@ -297,12 +297,12 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> SymbolUploadBeginResponse:
         """Upload debug symbols
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str symbols_path: The path to the symbols
-        :param str symbol_type: The type of symbols being uploaded
-        :param str | None build_number: The build number (required for Android)
-        :param str | None version: The build version (required for Android)
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param symbols_path: The path to the symbols
+        :param symbol_type: The type of symbols being uploaded
+        :param build_number: The build number (required for Android)
+        :param version: The build version (required for Android)
 
         :raises ValueError: If the build number or version aren't specified and it's an Android upload
 
@@ -316,7 +316,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             if version is None:
                 raise ValueError("The version is required for Android")
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/symbol_uploads"
 
         data = {"symbol_type": symbol_type.value, "file_name": symbols_name}
@@ -327,28 +327,28 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
         if version:
             data["version"] = version
 
-        response = self.post(request_url, data=data)
+        response = self.http_post(request_url, data=data)
 
         return deserialize.deserialize(SymbolUploadBeginResponse, response.json())
 
     def commit_symbol_upload(
-        self, *, owner_name: str, app_name: str, upload_id: str
+        self, *, org_name: str, app_name: str, upload_id: str
     ) -> SymbolUploadEndRequest:
         """Commit a symbol upload operation
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str upload_id: The ID of the symbols upload to commit
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param upload_id: The ID of the symbols upload to commit
 
         :returns: The App Center symbol upload end response
         """
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += f"/symbol_uploads/{upload_id}"
 
         data = {"status": "committed"}
 
-        response = self.patch(request_url, data=data)
+        response = self.http_patch(request_url, data=data)
 
         return deserialize.deserialize(SymbolUploadEndRequest, response.json())
 
@@ -356,7 +356,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     def upload_symbols(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         symbols_path: str,
         symbols_name: str | None = None,
@@ -367,14 +367,14 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
     ) -> None:
         """Upload debug symbols
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param str symbols_path: The path to the symbols
-        :param str symbols_name: The name to use for the symbols (defaults to file basename)
-        :param str symbol_type: The type of symbols being uploaded
-        :param str | None build_number: The build number (required for Android)
-        :param str | None version: The build version (required for Android)
-        :param ProgressCallback | None progress_callback: The upload progress callback
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param symbols_path: The path to the symbols
+        :param symbols_name: The name to use for the symbols (defaults to file basename)
+        :param symbol_type: The type of symbols being uploaded
+        :param build_number: The build number (required for Android)
+        :param version: The build version (required for Android)
+        :param progress_callback: The upload progress callback
 
         For the upload progress callback, this is a callable where the first
         parameter is the number of bytes uploaded, and the second parameter is
@@ -391,7 +391,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             symbols_name = os.path.basename(symbols_path)
 
         begin_upload_response = self.begin_symbol_upload(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             symbols_name=symbols_name,
             symbol_type=symbol_type,
@@ -415,7 +415,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             )
 
         commit_response = self.commit_symbol_upload(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             upload_id=begin_upload_response.symbol_upload_id,
         )
@@ -425,21 +425,21 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
     # pylint: enable=too-many-arguments
 
-    def _next_link_polished(self, next_link: str, owner_name: str, app_name: str) -> str:
+    def _next_link_polished(self, next_link: str, org_name: str, app_name: str) -> str:
         """Polish nextLink string gotten from AppCenter service
 
-        :param str next_link: The nextLink property from a service response when items are queried in batches
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
+        :param next_link: The nextLink property from a service response when items are queried in batches
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
 
         :returns: A polished next link to use on next batch
         """
 
         _ = self
 
-        if f"{owner_name}/{app_name}" not in next_link:
-            # For some apps, AppCenter is returning invalid nextLinks without app name and owner, just a // instead.
-            next_link = next_link.replace("//", f"/{owner_name}/{app_name}/", 1)
+        if f"{org_name}/{app_name}" not in next_link:
+            # For some apps, AppCenter is returning invalid nextLinks without app name and org, just a // instead.
+            next_link = next_link.replace("//", f"/{org_name}/{app_name}/", 1)
 
         # AppCenter is returning a nextLink with a /api on the URL which causes the request to fail.
         return next_link.replace("/api", "", 1)

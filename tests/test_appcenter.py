@@ -71,7 +71,7 @@ def get_from_keychain() -> str | None:
 def get_tokens() -> list[str]:
     """Get the tokens for authentication.
 
-    :returns: The owner name, app name and token as a tuple.
+    :returns: The org name, app name and token as a tuple.
     """
     details = get_from_keychain()
 
@@ -82,10 +82,10 @@ def get_tokens() -> list[str]:
 
 
 @pytest.fixture(scope="session")
-def owner_name() -> str:
-    """Get the owner name.
+def org_name() -> str:
+    """Get the org name.
 
-    :returns: The owner name
+    :returns: The org name
     """
     return get_tokens()[0]
 
@@ -108,7 +108,7 @@ def token() -> str:
     return get_tokens()[2]
 
 
-def test_construction(owner_name: str, app_name: str, token: str):
+def test_construction(org_name: str, app_name: str, token: str):
     """Test construction."""
     client = appcenter.AppCenterClient(access_token=token)
     start_time = datetime.datetime.now() - datetime.timedelta(days=10)
@@ -117,14 +117,14 @@ def test_construction(owner_name: str, app_name: str, token: str):
     error_group_batch_count = 0
 
     for group in client.crashes.get_error_groups(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         start_time=start_time,
         order_by="count desc",
         limit=1,
     ):
         group_details = client.crashes.group_details(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             error_group_id=group.errorGroupId,
         )
@@ -132,7 +132,7 @@ def test_construction(owner_name: str, app_name: str, token: str):
         assert group_details is not None
 
         errors = client.crashes.errors_in_group(
-            owner_name=owner_name,
+            org_name=org_name,
             app_name=app_name,
             start_time=start_time,
             error_group_id=group.errorGroupId,
@@ -142,7 +142,7 @@ def test_construction(owner_name: str, app_name: str, token: str):
         for error in errors:
             assert error.errorId is not None
             error_details = client.crashes.error_details(
-                owner_name=owner_name,
+                org_name=org_name,
                 app_name=app_name,
                 error_group_id=group.errorGroupId,
                 error_id=error.errorId,
@@ -150,7 +150,7 @@ def test_construction(owner_name: str, app_name: str, token: str):
             assert error_details is not None
 
             full_details = client.crashes.error_info_dictionary(
-                owner_name=owner_name,
+                org_name=org_name,
                 app_name=app_name,
                 error_group_id=group.errorGroupId,
                 error_id=error.errorId,
@@ -168,64 +168,64 @@ def test_construction(owner_name: str, app_name: str, token: str):
             break
 
 
-def test_recent(owner_name: str, app_name: str, token: str):
+def test_recent(org_name: str, app_name: str, token: str):
     """Test recent."""
     client = appcenter.AppCenterClient(access_token=token)
-    recent_builds = client.versions.recent(owner_name=owner_name, app_name=app_name)
+    recent_builds = client.versions.recent(org_name=org_name, app_name=app_name)
     for build in recent_builds:
         print(build)
 
 
-def test_versions(owner_name: str, app_name: str, token: str):
+def test_versions(org_name: str, app_name: str, token: str):
     """Test recent."""
     client = appcenter.AppCenterClient(access_token=token)
-    builds = client.versions.all(owner_name=owner_name, app_name=app_name)
+    builds = client.versions.all(org_name=org_name, app_name=app_name)
     for build in builds:
         print(build)
 
 
-def test_release_id(owner_name: str, app_name: str, token: str):
+def test_release_id(org_name: str, app_name: str, token: str):
     """Test release id check."""
     client = appcenter.AppCenterClient(access_token=token)
     release_id = client.versions.release_id_for_version(
-        owner_name=owner_name, app_name=app_name, version="2917241"
+        org_name=org_name, app_name=app_name, version="2917241"
     )
     print(release_id)
 
 
-def test_release_details(owner_name: str, app_name: str, token: str):
+def test_release_details(org_name: str, app_name: str, token: str):
     """Test release details."""
     client = appcenter.AppCenterClient(access_token=token)
-    recent_builds = client.versions.recent(owner_name=owner_name, app_name=app_name)
+    recent_builds = client.versions.recent(org_name=org_name, app_name=app_name)
     build = recent_builds[0]
     full_details = client.versions.release_details(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         release_id=build.identifier,
     )
     print(full_details)
 
 
-def test_latest_commit(owner_name: str, app_name: str, token: str):
+def test_latest_commit(org_name: str, app_name: str, token: str):
     """Test release details."""
     client = appcenter.AppCenterClient(access_token=token)
-    commit_hash = client.versions.latest_commit(owner_name=owner_name, app_name=app_name)
+    commit_hash = client.versions.latest_commit(org_name=org_name, app_name=app_name)
     assert commit_hash is not None
 
 
-def test_release_counts(owner_name: str, app_name: str, token: str):
+def test_release_counts(org_name: str, app_name: str, token: str):
     """Test release details."""
     client = appcenter.AppCenterClient(access_token=token)
-    recent_builds = client.versions.recent(owner_name=owner_name, app_name=app_name)
+    recent_builds = client.versions.recent(org_name=org_name, app_name=app_name)
     build = recent_builds[0]
     full_details = client.versions.release_details(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         release_id=build.identifier,
     )
     assert full_details.destinations is not None
     counts = client.analytics.release_counts(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         releases=[
             appcenter.models.ReleaseWithDistributionGroup(
@@ -236,14 +236,14 @@ def test_release_counts(owner_name: str, app_name: str, token: str):
     print(counts)
 
 
-def test_upload(owner_name: str, token: str):
+def test_upload(org_name: str, token: str):
     """Test upload."""
     ipa_path = "/path/to/some.ipa"
     if not os.path.exists(ipa_path):
         return
     client = appcenter.AppCenterClient(access_token=token)
     release_id = client.versions.upload_build(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name="UploadTestApp",
         binary_path=ipa_path,
         release_notes="These are some release notes",
@@ -254,7 +254,7 @@ def test_upload(owner_name: str, token: str):
     assert release_id is not None
 
 
-def test_symbol_upload(owner_name: str, token: str):
+def test_symbol_upload(org_name: str, token: str):
     """Test symbol."""
     symbols_path = "/path/to/some.dSYM.zip"
 
@@ -263,7 +263,7 @@ def test_symbol_upload(owner_name: str, token: str):
 
     client = appcenter.AppCenterClient(access_token=token)
     client.crashes.upload_symbols(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name="UploadTestApp",
         version="0.1",
         build_number="123",
@@ -272,7 +272,7 @@ def test_symbol_upload(owner_name: str, token: str):
     )
 
 
-def test_annotations(owner_name: str, app_name: str, token: str):
+def test_annotations(org_name: str, app_name: str, token: str):
     """Test construction."""
     client = appcenter.AppCenterClient(access_token=token)
 
@@ -280,7 +280,7 @@ def test_annotations(owner_name: str, app_name: str, token: str):
     annotation = str(uuid.uuid4())
 
     for result in client.crashes.get_error_groups(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         start_time=datetime.datetime.now() - datetime.timedelta(days=14),
         order_by="count desc",
@@ -292,14 +292,14 @@ def test_annotations(owner_name: str, app_name: str, token: str):
     assert group_id is not None
 
     client.crashes.set_annotation(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         error_group_id=group_id,
         annotation=annotation,
     )
 
     details = client.crashes.group_details(
-        owner_name=owner_name,
+        org_name=org_name,
         app_name=app_name,
         error_group_id=group_id,
     )
@@ -307,10 +307,10 @@ def test_annotations(owner_name: str, app_name: str, token: str):
     assert details.annotation == annotation
 
 
-def test_users(owner_name: str, app_name: str, token: str):
+def test_users(org_name: str, app_name: str, token: str):
     """Test construction."""
     client = appcenter.AppCenterClient(access_token=token)
-    users = client.account.users(owner_name=owner_name, app_name=app_name)
+    users = client.apps.users(org_name=org_name, app_name=app_name)
 
     assert len(users) > 0
 
@@ -366,24 +366,33 @@ def test_create_delete_tokens(token: str):
     client.tokens.delete_user_token(new_token)
 
 
-def test_get_teams(owner_name: str, token: str):
+def test_get_teams(org_name: str, token: str):
     """Test get teams"""
     client = appcenter.AppCenterClient(access_token=token)
-    teams = client.account.teams(owner_name=owner_name)
+    teams = client.orgs.teams.get(org_name=org_name)
     assert len(teams) != 0
 
 
-def test_get_team_users(owner_name: str, token: str):
+def test_get_team_users(org_name: str, token: str):
     """Test get teams"""
     client = appcenter.AppCenterClient(access_token=token)
-    teams = client.account.teams(owner_name=owner_name)
+    teams = client.orgs.teams.get(org_name=org_name)
     team = teams[0]
-    users = client.account.team_users(owner_name=owner_name, team_name=team.name)
+    users = client.orgs.teams.users(org_name=org_name, team_name=team.name)
     assert len(users) != 0
 
 
-def test_get_apps(owner_name: str, token: str):
+def test_get_apps(org_name: str, token: str):
     """Test get apps"""
     client = appcenter.AppCenterClient(access_token=token)
-    apps = client.account.apps(owner_name=owner_name)
+    apps = client.orgs.apps(org_name=org_name)
     assert len(apps) != 0
+
+
+def test_get_apps_teams(org_name: str, token: str):
+    """Test get apps"""
+    client = appcenter.AppCenterClient(access_token=token)
+    apps = client.orgs.apps(org_name=org_name)
+    assert len(apps) != 0
+    teams = client.apps.teams(org_name=org_name, app_name=apps[0].name)
+    assert len(teams) != 0

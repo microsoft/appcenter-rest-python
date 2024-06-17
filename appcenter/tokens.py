@@ -39,7 +39,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
         request_url = self.base_url()
         request_url += "/api_tokens"
 
-        response = self.get(request_url)
+        response = self.http_get(request_url)
 
         return deserialize.deserialize(list[UserToken], response.json())
 
@@ -55,7 +55,7 @@ class AppCenterTokensClient(AppCenterDerivedClient):
 
         self.log.debug(f"Creating user token name={name}, scope={scope}")
 
-        response = self.post(request_url, data={"description": name, "scope": [scope.value]})
+        response = self.http_post(request_url, data={"description": name, "scope": [scope.value]})
 
         return deserialize.deserialize(UserToken, response.json())
 
@@ -75,4 +75,4 @@ class AppCenterTokensClient(AppCenterDerivedClient):
             self.log.debug(f"Deleting user token={token.identifier}")
             request_url += token.identifier
 
-        _ = self.delete(request_url)
+        _ = self.http_delete(request_url)

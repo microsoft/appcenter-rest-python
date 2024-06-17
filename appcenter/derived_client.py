@@ -142,36 +142,36 @@ class AppCenterDerivedClient:
     def base_url(self, *, version: str = "0.1") -> str:
         """Generate the base URL for the API.
 
-        :param str version: The API version to hit
+        :param version: The API version to hit
 
         :returns: The base URL
         """
         return f"{API_BASE_URL}/v{version}"
 
-    def generate_app_url(self, *, version: str = "0.1", owner_name: str, app_name: str) -> str:
+    def generate_app_url(self, *, version: str = "0.1", org_name: str, app_name: str) -> str:
         """Generate a URL to use for querying the API for app info.
 
-        :param str version: The API version to hit
-        :param str owner_name: The name of the owner of the app
-        :param str app_name: The name of the app
+        :param version: The API version to hit
+        :param org_name: The name of the org
+        :param app_name: The name of the app
 
         :returns: A generated URL base
         """
 
-        url = self.base_url(version=version) + f"/apps/{owner_name}/{app_name}"
+        url = self.base_url(version=version) + f"/apps/{org_name}/{app_name}"
         self.log.debug(f"Generated URL: {url}")
         return url
 
-    def generate_org_url(self, *, version: str = "0.1", owner_name: str) -> str:
+    def generate_org_url(self, *, version: str = "0.1", org_name: str) -> str:
         """Generate a URL to use for querying the API for org info.
 
-        :param str version: The API version to hit
-        :param str owner_name: The name of the org owner
+        :param version: The API version to hit
+        :param org_name: The name of the org
 
         :returns: A generated URL base
         """
 
-        url = self.base_url(version=version) + f"/orgs/{owner_name}"
+        url = self.base_url(version=version) + f"/orgs/{org_name}"
         self.log.debug(f"Generated URL: {url}")
         return url
 
@@ -185,7 +185,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def get(self, url: str) -> requests.Response:
+    def http_get(self, url: str) -> requests.Response:
         """Perform a GET request to a url
 
         :param url: The URL to run the GET on
@@ -207,7 +207,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def patch(self, url: str, *, data: Any) -> requests.Response:
+    def http_patch(self, url: str, *, data: Any) -> requests.Response:
         """Perform a PATCH request to a url
 
         :param url: The URL to run the POST on
@@ -229,7 +229,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post(self, url: str, *, data: Any) -> requests.Response:
+    def http_post(self, url: str, *, data: Any) -> requests.Response:
         """Perform a POST request to a url
 
         :param url: The URL to run the POST on
@@ -251,7 +251,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post_raw_data(self, url: str, data: Any) -> requests.Response:
+    def http_post_raw_data(self, url: str, data: Any) -> requests.Response:
         """Perform a POST request to a url
 
         :param url: The URL to run the POST on
@@ -273,7 +273,9 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def post_files(self, url: str, *, files: dict[str, tuple[str, BinaryIO]]) -> requests.Response:
+    def http_post_files(
+        self, url: str, *, files: dict[str, tuple[str, BinaryIO]]
+    ) -> requests.Response:
         """Perform a POST request to a url, sending files
 
         :param url: The URL to run the POST on
@@ -298,7 +300,7 @@ class AppCenterDerivedClient:
         wait=wait_fixed(10),
         stop=stop_after_attempt(3),
     )
-    def delete(self, url: str) -> requests.Response:
+    def http_delete(self, url: str) -> requests.Response:
         """Perform a DELETE request to a url
 
         :param url: The URL to run the DELETE on

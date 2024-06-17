@@ -7,25 +7,29 @@
 
 import logging
 
-from appcenter.account import AppCenterAccountClient
+from appcenter.apps import AppCenterAppsClient
 from appcenter.analytics import AppCenterAnalyticsClient
 from appcenter.crashes import AppCenterCrashesClient
+from appcenter.orgs import AppCenterOrgsClient
 from appcenter.tokens import AppCenterTokensClient
 from appcenter.versions import AppCenterVersionsClient
+
+# pylint: disable=too-many-instance-attributes
 
 
 class AppCenterClient:
     """Class responsible for getting data from App Center through REST calls.
 
-    :param str access_token: The access token to use for authentication. Leave as None to use KeyVault
+    :param access_token: The access token to use for authentication. Leave as None to use KeyVault
     """
 
     log: logging.Logger
     token: str
 
-    account: AppCenterAccountClient
+    apps: AppCenterAppsClient
     analytics: AppCenterAnalyticsClient
     crashes: AppCenterCrashesClient
+    orgs: AppCenterOrgsClient
     tokens: AppCenterTokensClient
     versions: AppCenterVersionsClient
 
@@ -38,8 +42,12 @@ class AppCenterClient:
             self.log = parent_logger.getChild("appcenter")
 
         self.token = access_token
-        self.account = AppCenterAccountClient(self.token, self.log)
+        self.apps = AppCenterAppsClient(self.token, self.log)
         self.analytics = AppCenterAnalyticsClient(self.token, self.log)
         self.crashes = AppCenterCrashesClient(self.token, self.log)
+        self.orgs = AppCenterOrgsClient(self.token, self.log)
         self.tokens = AppCenterTokensClient(self.token, self.log)
         self.versions = AppCenterVersionsClient(self.token, self.log)
+
+
+# pylint: enable=too-many-instance-attributes

@@ -13,16 +13,16 @@ client = appcenter.AppCenterClient(access_token="abc123def456")
 
 # 3. Check some error groups
 start = datetime.datetime.now() - datetime.timedelta(days=10)
-for group in client.crashes.get_error_groups(owner_name="owner", app_name="myapp", start_time=start):
+for group in client.crashes.get_error_groups(org_name="org", app_name="myapp", start_time=start):
     print(group.errorGroupId)
-    
+
 # 4. Get recent versions
-for version in client.versions.all(owner_name="owner", app_name="myapp"):
+for version in client.versions.all(org_name="org", app_name="myapp"):
     print(version)
-    
+
 # 5. Create a new release
 client.versions.upload_and_release(
-    owner_name="owner",
+    org_name="org",
     app_name="myapp",
     version="0.1",
     build_number="123",
@@ -37,7 +37,7 @@ client.versions.upload_and_release(
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 

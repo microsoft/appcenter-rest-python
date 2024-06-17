@@ -24,22 +24,22 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
     def release_counts(
         self,
         *,
-        owner_name: str,
+        org_name: str,
         app_name: str,
         releases: list[ReleaseWithDistributionGroup],
     ) -> ReleaseCounts:
         """Get the release counts for an app
 
-        :param str owner_name: The name of the app account owner
-        :param str app_name: The name of the app
-        :param list[ReleaseWithDistributionGroup] releases: The list of releases to get the counts for
+        :param org_name: The name of the organization
+        :param app_name: The name of the app
+        :param releases: The list of releases to get the counts for
 
         :returns: The release counts
         """
 
-        self.log.info(f"Getting release counts for: {owner_name}/{app_name}")
+        self.log.info(f"Getting release counts for: {org_name}/{app_name}")
 
-        request_url = self.generate_app_url(owner_name=owner_name, app_name=app_name)
+        request_url = self.generate_app_url(org_name=org_name, app_name=app_name)
         request_url += "/analytics/distribution/release_counts"
 
         data = []
@@ -51,6 +51,6 @@ class AppCenterAnalyticsClient(AppCenterDerivedClient):
                 }
             )
 
-        response = self.post(request_url, data={"releases": data})
+        response = self.http_post(request_url, data={"releases": data})
 
         return deserialize.deserialize(ReleaseCounts, response.json())

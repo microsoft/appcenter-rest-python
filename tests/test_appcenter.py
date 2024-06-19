@@ -264,7 +264,7 @@ def test_symbol_upload(org_name: str, token: str):
     client = appcenter.AppCenterClient(access_token=token)
     client.crashes.upload_symbols(
         org_name=org_name,
-        app_name="UploadTestApp",
+        app_name="Test",
         version="0.1",
         build_number="123",
         symbols_path=symbols_path,

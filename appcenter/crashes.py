@@ -9,7 +9,7 @@ import os
 from typing import Any, Iterator
 import urllib.parse
 
-from azure.storage.blob import BlobType, ContainerClient
+from azure.storage.blob import BlobServiceClient
 import deserialize
 
 import appcenter.constants
@@ -405,14 +405,10 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
             container, blob_name = path.split("/")
             connection_string = f"BlobEndpoint={url_components.scheme}://{url_components.netloc};"
             connection_string += f"SharedAccessSignature={url_components.query}"
-            service = ContainerClient.from_connection_string(connection_string, container)
-            service.upload_blob(
-                blob_name,
-                symbols_file,
-                BlobType.BLOCKBLOB,
-                overwrite=True,
-                progress_hook=progress_callback,
-            )
+
+            service = BlobServiceClient.from_connection_string(connection_string)
+            blob_client = service.get_blob_client(container, blob_name, None)
+            blob_client.upload_blob(symbols_file, progress_hook=progress_callback, overwrite=True)
 
         commit_response = self.commit_symbol_upload(
             org_name=org_name,

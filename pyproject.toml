@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "appcenter"
-version = "5.0.0"
+version = "6.0.0"
 description = "A Python wrapper around the App Center REST API."
 
 license = "MIT"
@@ -15,12 +15,13 @@ homepage = "https://github.com/Microsoft/appcenter-rest-python"
 keywords = ['app center', 'api']
 
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
     'Topic :: Software Development',
     'Topic :: Utilities',
 ]

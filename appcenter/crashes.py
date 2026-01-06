@@ -6,7 +6,7 @@
 import datetime
 import logging
 import os
-from typing import Any, Iterator
+from typing import Any, cast, Iterator
 import urllib.parse
 
 from azure.storage.blob import BlobServiceClient
@@ -78,7 +78,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
     def error_info_dictionary(
         self, *, org_name: str, app_name: str, error_group_id: str, error_id: str
-    ) -> HandledErrorDetails:
+    ) -> dict[str, Any]:
         """Get the full error info dictionary.
 
         This is the full details that App Center has on a crash. It is not
@@ -97,7 +97,7 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
         response = self.http_get(request_url)
 
-        return deserialize.deserialize(dict[str, Any], response.json())
+        return cast(dict[str, Any], response.json())
 
     def set_annotation(
         self,
@@ -209,7 +209,8 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             error_groups = deserialize.deserialize(ErrorGroups, response.json())
 
-            yield from error_groups.errorGroups
+            if error_groups.errorGroups:
+                yield from error_groups.errorGroups
 
             if error_groups.nextLink is None:
                 break
@@ -276,7 +277,8 @@ class AppCenterCrashesClient(AppCenterDerivedClient):
 
             errors = deserialize.deserialize(HandledErrors, response.json())
 
-            yield from errors.errors
+            if errors.errors:
+                yield from errors.errors
 
             if errors.nextLink is None:
                 break

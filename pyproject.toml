@@ -5,9 +5,7 @@ description = "A Python wrapper around the App Center REST API."
 
 license = "MIT"
 
-authors = [
-    "Dale Myers <dalemy@microsoft.com>"
-]
+authors = ["Dale Myers <dalemy@microsoft.com>"]
 
 readme = 'README.md'
 
@@ -24,11 +22,11 @@ classifiers = [
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Topic :: Software Development',
-    'Topic :: Utilities'
+    'Topic :: Utilities',
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 azure-storage-blob = "^12.13.0"
 deserialize = "^2.0.1"
 requests = "^2.32.0"
@@ -36,18 +34,23 @@ tenacity = "^8.2.2"
 types-requests = "^2.32.0.20240602"
 
 [tool.poetry.dev-dependencies]
-black = "24.4.2"
-mypy = "1.10.0"
-pylint = "3.1.0"
-pytest = "^8.2.0"
-pytest-cov = "^5.0.0"
+black = "25.12.0"
+mypy = "1.19.1"
+pylint = "4.0.4"
+pyright = "^1.1.390"
+pytest = "^9.0.2"
+pytest-cov = "^7.0.0"
 
 [[tool.mypy.overrides]]
-module = [
-    "deserialize",
-    "azure.storage.blob"
-]
+module = ["deserialize", "azure.storage.blob"]
 ignore_missing_imports = true
+
+[tool.pyright]
+include = ["appcenter", "tests"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+reportMissingImports = true
+reportMissingTypeStubs = false
 
 [build-system]
 requires = ["poetry-core"]

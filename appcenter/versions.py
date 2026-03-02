@@ -6,7 +6,6 @@
 import logging
 import os
 import time
-from typing import Iterator
 import urllib.parse
 
 import deserialize
@@ -81,7 +80,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         app_name: str,
         published_only: bool = False,
         scope: str | None = None,
-    ) -> Iterator[BasicReleaseDetailsResponse]:
+    ) -> list[BasicReleaseDetailsResponse]:
         """Get all (the 100 latest) versions.
 
         :param org_name: The name of the organization
@@ -91,7 +90,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                                     releases that have been distributed to
                                     groups that the user belongs to.
 
-        :returns: An iterator of BasicReleaseDetailsResponse
+        :returns: A list of BasicReleaseDetailsResponse
         """
 
         self.log.info(f"Getting versions of app: {org_name}/{app_name}")
@@ -252,7 +251,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
         chunk_number: int,
         chunk: bytearray,
         create_release_upload_response: CreateReleaseUploadResponse,
-    ) -> SetUploadMetadataResponse | None:
+    ) -> ChunkUploadResponse | None:
         """Set the metadata for a binary upload
 
         :param create_release_upload_response: The response to a `get_upload_url` call
@@ -437,8 +436,10 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
                 wait()
                 continue
 
+            raw_response = response.json()
+
             try:
-                response_data = deserialize.deserialize(CommitUploadResponse, response.json())
+                response_data = deserialize.deserialize(CommitUploadResponse, raw_response)
             except Exception as ex:
                 self.log.warning(f"Failed to get response data: {ex}")
                 wait()
@@ -460,7 +461,7 @@ class AppCenterVersionsClient(AppCenterDerivedClient):
             if response_data.upload_status == "error":
                 raise Exception(
                     "An error occurred when waiting for binary: "
-                    + response_data.get("error_details", "?")
+                    + raw_response.get("error_details", "?")
                 )
 
             raise Exception(f"Unexpected status: {response_data.upload_status}")

@@ -13,6 +13,7 @@ from appcenter.crashes import AppCenterCrashesClient
 from appcenter.orgs import AppCenterOrgsClient
 from appcenter.tokens import AppCenterTokensClient
 from appcenter.versions import AppCenterVersionsClient
+from appcenter import models
 
 # pylint: disable=too-many-instance-attributes
 
